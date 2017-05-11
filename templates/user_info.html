@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1> User information for: {{ user.email }} </h1>
+
+Email: {{ user.email }}<br>
+{% if user.phone %} 
+    Phone Number: ({{ user.phone[:3] }}) {{user.phone[3:6]}} - {{user.phone[6:10]}}
+{% else %}
+    No Phone Number Associated with This Account
+{% endif %}
+<p>
+<form action='/update_user' method="POST">
+Update Information:<br>
+(please fill out all fields)<br>
+Email: <input type="text" name= "email" required="True"><br>
+Password: <input type="password" name="password" required="True">
+<input type='submit' value="Update">
+</form>
+</p>
+
+<p>
+<form action='/update_user' method="POST">
+Add or change number:<br>
+New Number: <input type="text" name="number" required="True">
+<input type="submit" name="Update">
+</form>
+</p>
+
+<p>
+    <form action='/' method="POST">
+    <input type='submit' value='logout'>
+    </form>
+</p>
+
+<p>
+    <form action='/parking'>
+    <input type='submit' value='Park'>
+    </form>
+</p>
+
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>How Long Until Street Cleaning</h1>
+<h3>Use Current Location--need to add</h3>
+<h3> Use Nearest Address</h3>
+    </p>
+    <form>
+        Number: <input type= "text" name="address" id="address"><br>
+        Street: <select name="street" id="street">
+        {% for street in streets %}
+                <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+        {% endfor %}
+                </select>
+                <br>
+
+        Side of Street: <select name="side" id="side">
+        {% for side in sides %}
+                <option value={{ side.side_name }}>{{ side.side_name }}</option>
+        {% endfor %}
+                </select>
+                <br>
+        <button id="address-btn">When is Street Cleaning?</button>
+    </form>
+    </p>
+
+<div id="timeleft"></div>
+<button>Get A Text Reminder</button>
+
+<p>
+    <form action='/' method="POST">
+    <input type='submit' value='logout'>
+    </form>
+</p>
+<p>
+    <form action="/user_info">
+    <input type="submit" value="User Information">
+    </form>
+<div id="map"></div>
+
+
+<!-- Replace the value of the key parameter with your own API key. -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ&callback=initMap">
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script type="text/javascript" src="/static/js/showstreetcleaninginfo.js"></script>
+<script type="text/javascript" src="/static/js/map.js"></script>
+
+{% endblock %}

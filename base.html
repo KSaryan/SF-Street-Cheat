@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+  <title>SF Street Cheat</title>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  {% endwith %}
+</head>
+
+<body>
+  
+  <h1>SF Street Cheat</h1>
+
+  {% block content %} put your content here {% endblock %}
+
+<p>
+    <form action='/' method="POST">
+    <input type='submit' value='logout'>
+    </form>
+</p>
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script type="text/javascript" src="/static/js/showstreetcleaninginfo.js"></script>
+<script type="text/javascript">
+  alert("hi");
+
+</script> -->
+</body>
+</html>

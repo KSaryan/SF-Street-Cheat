@@ -1,0 +1,24 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<p>
+Welcome! Login to use.
+</p>
+<p>
+    <h2>Login</h2>
+    <form action='/verify_user' method="POST">
+        Email: <input type="text" name="email" required="True">
+        Password: <input type="password" name="password" required="True">
+        <input type="submit" name="submit">
+    </form>
+</p>
+<p>
+    <h2>Register</h2>
+    <form action='/create_user' method="POST">
+        Email: <input type="text" name="email" required="True">
+        Password: <input type="text" name="password" required="True">
+        <input type="submit" name="submit">
+    </form>
+
+
+{% endblock %}
