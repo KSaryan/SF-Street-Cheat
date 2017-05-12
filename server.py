@@ -1,22 +1,16 @@
 from jinja2 import StrictUndefined
-
 from flask import jsonify
 from flask import (Flask, render_template, redirect, request, flash,
                    session, url_for)
-
 # from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import update
-
 from model import (Location, Cleaning, Day, User, Side, 
                    Street, FaveLocation, connect_to_db, db, find_next_cleaning)
-
 import json
-
 from datetime import datetime, timedelta, date
-
 import bcrypt
-
 import pytz
+import requests
 
 app = Flask(__name__)
 app.secret_key = "ABC"
@@ -102,8 +96,6 @@ def update_user_info():
         email=email.lower()
         user.email=email
         user.password=password
-        db.session.add(user)
-        db.session.commit()
     
     if number:
         number=number.replace("-", "")
@@ -111,8 +103,9 @@ def update_user_info():
         number=number.replace("(", "")
         number=number.replace(")", "")
         user.phone=number
-        db.session.add(user)
-        db.session.commit()
+    
+    db.session.add(user)
+    db.session.commit()
 
     flash('Information Updated')
     return redirect('/user_info')
@@ -122,7 +115,7 @@ def update_user_info():
 def parking():
     """Allows user to submit new parking information"""
 
-    streets = Street.query.all()
+    streets = Street.query.order_by(Street.street_name.asc()).all()
     sides = Side.query.all()
     if 'login' in session:
         return render_template('parking.html', streets=streets, sides=sides)
@@ -178,6 +171,21 @@ def street_cleaning():
                                                                                   cleaning.end_time)
     else:
         return "Not a valid address"
+
+@app.route('/current_location')
+def get_current_location():
+    lat = request.args.get("lat")
+    lng = request.args.get("lng")
+    print lat 
+    print lng
+    url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&sensor=true"%(lat, lng)
+
+    response = requests.get(url)
+    print response
+    if response.status_code == 200:
+        data = response.json()
+        address = data["results"][0]["address_components"][1]["long_name"]
+    return address
 
 
 # @app.route('/side_decider')

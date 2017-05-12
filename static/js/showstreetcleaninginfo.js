@@ -1,4 +1,3 @@
-
 function displayResults(result){
     $('#timeleft').html(result)
 }

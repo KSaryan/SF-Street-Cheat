@@ -53,7 +53,7 @@ class Location(db.Model):
     def __repr__ (self):
         """Displayed when called"""
 
-        return "<rt: %s-%s, lt: %s-%s for street: %s>"%(self.rt_from_address,
+        return "<rt: %s-%s, lt: %s-%s for loc: %s>"%(self.rt_from_address,
                                                         self.rt_to_address,
                                                         self.lt_from_address,
                                                         self.lt_to_address,
@@ -162,13 +162,13 @@ class MessagesToSend(db.Model):
     def __repr__ (self):
         """Displayed when called"""
 
-        return "<Id: %s, user-id: %s, time: %s>"%(self.message_id, 
-                                                            self.user_id, 
-                                                            self.time)
+        return "<id: %s, user-id: %s, time: %s>"%(self.message_id, 
+                                                  self.user_id, 
+                                                  self.time)
 
 
 def find_next_cleaning(street_cleanings):
-    """returns date of next cleaning"""
+    """Returns date of next cleaning"""
 
     pacific = pytz.timezone('US/Pacific')
     now = datetime.now(tz=pacific)

@@ -5,6 +5,7 @@ function initMap() {
     zoom: 6
   });
   infoWindow = new google.maps.InfoWindow;
+  console.log(infoWindow);
 
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
@@ -18,7 +19,8 @@ function initMap() {
       infoWindow.setContent('Parking');
       infoWindow.open(map);
       map.setCenter(pos);
-    }, function() {
+    }, function(posError) {
+      console.log(posError);
       handleLocationError(true, infoWindow, map.getCenter());
     });
   } else {
@@ -27,9 +29,10 @@ function initMap() {
   }
 }
 
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
   infoWindow.setContent(browserHasGeolocation ?
                         'Error: The Geolocation service failed.' :
                         'Error: Your browser doesn\'t support geolocation.');
   infoWindow.open(map);
+}
