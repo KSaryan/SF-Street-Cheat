@@ -10,6 +10,9 @@
     h1{
       color: green;
     }
+    .hidden{
+      display: none;
+    }
   </style>
 
   {% with messages = get_flashed_messages() %}
@@ -29,10 +32,6 @@
   <h1>SF Street Cheat</h1>
 
   {% block content %} put your content here {% endblock %}
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-  <script type="text/javascript" src="/static/js/showstreetcleaninginfo.js"></script>
-  <script type="text/javascript" src="/static/js/map.js"></script>
-  <script type="text/javascript" src="/static/js/coordinates.js"></script>
   
 </body>
 

@@ -32,7 +32,7 @@ def create_cleanings():
 
     Location.query.delete()
 
-    url = "https://data.sfgov.org/resource/u2ac-gv9v.json?$limit=39000&zip_code=94118"
+    url = "https://data.sfgov.org/resource/u2ac-gv9v.json?$limit=39000"
 
     response = requests.get(url)
     if response.status_code == 200:
@@ -46,20 +46,23 @@ def create_cleanings():
                 s = Street(street_name=item["streetname"])
                 db.session.add(s)
                 db.session.commit()
-
-            if Side.query.filter_by(side_name=item["blockside"]).first():
-                side = Side.query.filter_by(side_name=item["blockside"]).first()
+            if "blockside" in item:
+                if Side.query.filter_by(side_name=item["blockside"]).first():
+                    side = Side.query.filter_by(side_name=item["blockside"]).first()
+                    side_id = side.side_id
+                else:
+                    side = Side(side_name=item["blockside"])
+                    db.session.add(side)
+                    db.session.commit()
+                    side_id = side.side_id
             else:
-                side = Side(side_name=item["blockside"])
-                db.session.add(side)
-                db.session.commit()
+                side_id = None
 
-            if Location.get_unique(s.street_id, item["rt_toadd"], item["lf_toadd"], side.side_id):
-                
+            if Location.get_unique(s.street_id, item["rt_toadd"], item["lf_toadd"], side_id):
                 location = Location(street_id=s.street_id, rt_from_address=item["rt_fadd"],
                                     rt_to_address=item["rt_toadd"], lt_from_address=item["lf_fadd"],
-                                    lt_to_address=item["lf_toadd"], side_id=side.side_id)
-                
+                                    lt_to_address=item["lf_toadd"], side_id=side_id,
+                                    lng_lat = item["geometry"]["coordinates"])
                 db.session.add(location)
                 db.session.commit()
 

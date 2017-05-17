@@ -75,7 +75,25 @@ class CleaningWeek(db.Model):
 #         db.session.add(cleaningday)
 
 #     db.session.commit()
+# @app.route('/side_decider')
+# def side_decider():
+#     sides = []
+#     number = int(request.args.get("address"))
+#     street = (request.args.get("street")).replace("-", " ")
+#     street1 = Street.query.filter(Street.street_name == street).first()
+#     if number % 2 == 0:
+#         locations = Location.query.filter(Location.street_id==street1.street_id,
+#                                           Location.rt_from_address <= number, 
+#                                           Location.rt_to_address >= number).all()
+#     else: 
+#         locations = Location.query.filter(Location.street_id==street1.street_id,
+#                                           Location.lt_from_address <= number, 
+#                                           Location.lt_to_address >= number).all()
+#     for location in locations:
+#         if location.side_id: 
+#             sides.append(location.sides.side_name)
 
+#     return sides
 
 # def create_cleaning_weeks():
 #     """Creates entry in cleaningweeks table"""

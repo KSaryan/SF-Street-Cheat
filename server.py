@@ -5,12 +5,20 @@ from flask import (Flask, render_template, redirect, request, flash,
 # from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import update
 from model import (Location, Cleaning, Day, User, Side, 
-                   Street, FaveLocation, connect_to_db, db, find_next_cleaning)
+                   Street, FaveLocation, MessageToSend, connect_to_db, db)
 import json
 from datetime import datetime, timedelta, date
 import bcrypt
 import pytz
 import requests
+import re
+
+import os
+from helpers import *
+import math
+from operator import itemgetter
+
+
 
 app = Flask(__name__)
 app.secret_key = "ABC"
@@ -56,6 +64,7 @@ def verify_user():
 @app.route('/create_user', methods=["POST"])
 def create_user():
     """Creates new user in database"""
+
     password = request.form.get("password")
     #not working
     # hashed = bcrypt.hashpw(password, bcrypt.gensalt())
@@ -67,7 +76,7 @@ def create_user():
         flash('There is already an email associated with this account. Please login.')
         return redirect('/')
     else:
-        user = User(password=hashed, email=email)
+        user = User(password=password, email=email)
         db.session.add(user)
         db.session.commit()
         session['login']= user.user_id
@@ -77,6 +86,8 @@ def create_user():
 
 @app.route('/user_info')
 def display_user_information():
+    """displays user information"""
+
     if 'login' in session:
         user = User.query.get(session['login'])
         return render_template('user_info.html', user=user)
@@ -88,6 +99,7 @@ def display_user_information():
 @app.route('/update_user', methods=["POST"])
 def update_user_info():
     """Updates User Information"""
+
     email=request.form.get("email")
     password=request.form.get("password")
     number=request.form.get("number")
@@ -124,89 +136,114 @@ def parking():
         return redirect('/')
 
 
-@app.route('/street_cleaning')
+@app.route('/street_cleaning.json')
 def street_cleaning():
     """Returns time until street cleaning"""
 
     number = int(request.args.get("address"))
     street = (request.args.get("street")).replace("-", " ")
     side = request.args.get("side")
-    street1 = Street.query.filter(Street.street_name == street).first()
-    side1 = Side.query.filter(Side.side_name==side).first()
-    if number % 2 == 0:
-        location = Location.query.filter(Location.side_id==side1.side_id,
-                                          Location.street_id==street1.street_id,
-                                          Location.rt_from_address <= number, 
-                                          Location.rt_to_address >= number).first()
-    else: 
-        location = Location.query.filter(Location.side_id==side1.side_id,
-                                          Location.street_id==street1.street_id,
-                                          Location.lt_from_address <= number, 
-                                          Location.lt_to_address >= number).first()
+    location = find_location(number, street, side)
     if location:
+        faveloc = FaveLocation(user_id = session['login'], loc_id = location.loc_id)
         street_cleanings = Cleaning.query.filter(Cleaning.loc_id==location.loc_id).all()
 
         next_cleaning = find_next_cleaning(street_cleanings)
-        pacific = pytz.timezone('US/Pacific')
-        if next_cleaning == "Street cleaning is now":
-            message1 = next_cleaning
-            return message1
-        elif next_cleaning[0] == "later today":
-            hours = next_cleaning[1]
-            return " Street cleaning is today. It's in %s hours." %(hours)
+        if next_cleaning[0] == "now":
+            result = {"info_message": next_cleaning[0], 
+                      "message": next_cleaning[1]}
+
         else:
-            days = int(next_cleaning[0].strftime('%d')) - int(datetime.now(tz=pacific).strftime('%d'))
-
-            cleaning = next_cleaning[1]
-
-            month = next_cleaning[0].strftime("%B")
-
-            date = next_cleaning[0].strftime("%d")
-
-            return  "Next cleaning is in %s days. On %s, %s %s. From %s to %s." %(days, 
-                                                                                  cleaning.days.day_name, 
-                                                                                  month, 
-                                                                                  date, 
-                                                                                  cleaning.start_time, 
-                                                                                  cleaning.end_time)
+            result = {"info_message": next_cleaning[0], 
+                      "message": next_cleaning[1],
+                      "cleaning_time":next_cleaning[2]}
     else:
-        return "Not a valid address"
+        message = "Not a valid address"
+        result = {"info_messge": "not a valid address",
+                  "message": message}
 
-@app.route('/current_location')
+
+    return jsonify(result)
+
+
+@app.route('/current_location.json')
 def get_current_location():
+    """use reverse geolocation to get nearest address"""
+
     lat = request.args.get("lat")
     lng = request.args.get("lng")
-    print lat 
-    print lng
     url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&sensor=true"%(lat, lng)
 
     response = requests.get(url)
-    print response
     if response.status_code == 200:
         data = response.json()
-        address = data["results"][0]["address_components"][1]["long_name"]
-    return address
+        street = (data["results"][0]["address_components"][1]["short_name"]).upper()
+        address= re.sub(r'\-\d+', "", data["results"][0]["address_components"][0]["long_name"])
+        sides = get_sides_for_this_location(street, address)
+        street = street.replace(" ", "-")
+        address_info = {'street': street,
+                        'address': address,
+                        'sides': sides
+                        }
+    return jsonify(address_info)
 
 
-# @app.route('/side_decider')
-# def side_decider():
-#     sides = []
-#     number = int(request.args.get("address"))
-#     street = (request.args.get("street")).replace("-", " ")
-#     street1 = Street.query.filter(Street.street_name == street).first()
-#     if number % 2 == 0:
-#         locations = Location.query.filter(Location.street_id==street1.street_id,
-#                                           Location.rt_from_address <= number, 
-#                                           Location.rt_to_address >= number).all()
-#     else: 
-#         locations = Location.query.filter(Location.street_id==street1.street_id,
-#                                           Location.lt_from_address <= number, 
-#                                           Location.lt_to_address >= number).all()
-#     for location in locations:
-#         if location.side_id: 
-#             sides.append(location.sides.side_name)
+@app.route('/find_sides.json')
+def find_sides():
+    """returns sides of street associated with an address"""
 
-#     return sides
+    address = request.args.get("address")
+    street = request.args.get("street")
+    street = street.replace("-", " ")
+    sides = get_sides_for_this_location(street, address)
+    sides_json = {'sides': sides
+                 }
+    return jsonify(sides_json)
+
+
+@app.route('/send_text', methods=["POST"])
+def send_text():
+    """Creates a new message in the MessagesToSend table"""
+
+    user = User.query.get(session["login"])
+    if user.phone:
+        time = request.form.get("cleaningtime")
+        message = MessageToSend(user_id=session['login'], time= time)
+        db.session.add(message)
+        db.session.commit()
+        return "True"
+    else:
+        flash("You must have a phone number to get texts")
+        return "False"
+
+@app.route('/nearby_cleanings')
+def find_nearby_cleanings():
+    address = int(request.args.get("address"))
+    street = (request.args.get("street")).replace("-", " ")
+    side = request.args.get("side")
+    # current_location = find_location(address, street, side)
+    street = street.split(" ")
+    address = str(address)
+    address_string = street[0] + "+" + street[1] + "+" + address + "+San+Francisco+CA"
+    url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ"%(address_string)
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        geolocation = data["results"][0]["geometry"]["location"]
+    locations = Location.query.all()
+    overall_distances = []
+    for location in locations:
+        distances = []
+        for coordinate in location.lng_lat:
+            distance = math.sqrt((coordinate[1]-geolocation['lat'])**2 + (coordinate[0]-geolocation['lng'])**2)
+            distances.append([distance, coordinate])
+        distances = sorted(distances, key=itemgetter(0))
+        best_distance = distances[-1]
+        overall_distances.append(best_distance)
+    overall_distances = sorted(overall_distances, key=itemgetter(0))
+    closest_places = overall_distances[-5:]
+    return jsonify(closest_places)
+
 
   
 if __name__ == "__main__":

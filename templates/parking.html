@@ -4,50 +4,65 @@
 
 <h1>How Long Until Street Cleaning</h1>
 <button id='currentlocation'>Use Current Location</button>
-<h3> Use Nearest Address</h3>
 <p>
-    <form>
-        Number: <input type= "text" name="address" id="address"><br>
+    <form id="adressinfo">
+        Number: <input type= "text" name="address" id="address" required="True"><br>
         
-        Street: <select name="street" id="street">
+        Street: <select name="street" id="street" required="True">
+            <option value = ' '>  </option>
             {% for street in streets %}
                 <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
             {% endfor %}
         </select>
         <br>
-
-        Side of Street: <select name="side" id="side">
-        {% for side in sides %}
-                <option value={{ side.side_name }}>{{ side.side_name }}</option>
-        {% endfor %}
+        <br>
+        <br>
+        <div id="sidediv">
+        Please Choose Side of Street: <select name="side" id="side" required="True">
+            <option value= " ">  </option>
+            {% for side in sides %}
+                <option value={{ side.side_name }} id = {{ side.side_name }} class = 'hidden sides'>{{ side.side_name }}</option>
+            {% endfor %}
         </select>
+        </div>
         <br>
 
-        <button id="address-btn">When is Street Cleaning?</button>
+        <button id="addressbtn">When is Street Cleaning?</button>
     </form>
 </p>
+
+<button id="locationsbtn">Nearby Places</button>
+<div id="locations"></div>
 
 <div id="timeleft"></div>
 
 
-<button>Get A Text Reminder</button>
+<form id="gettext">
+    <input name="cleaningtime" id="cleaningtime" type="hidden">
+    <input type="submit" name="submit" value="Get A Text Reminder">
+</form>
 
 <p>
     <form action='/' method="POST">
-    <input type='submit' value='logout'>
+        <input type='submit' value='logout'>
     </form>
 </p>
 
 <p>
     <form action="/user_info">
-    <input type="submit" value="User Information">
+        <input type="submit" value="User Information">
     </form>
 </p>
 
 <div id='map'></div>
-<script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ&callback=initMap">
-</script>
 
+<script type="text/javascript" src="/static/js/map.js"></script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ&callback=initMap"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script type="text/javascript" src="/static/js/showstreetcleaninginfo.js"></script>
+<!-- <script type="text/javascript" src="/static/js/coordinates.js"></script> -->
+<script type="text/javascript" src="/static/js/sendtext.js"></script>
+<script type="text/javascript" src='/static/js/locations.js'></script>
 {% endblock %}
 

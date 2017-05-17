@@ -46,7 +46,7 @@ class Location(db.Model):
     lt_from_address = db.Column(db.Integer, nullable=False)
     lt_to_address = db.Column(db.Integer, nullable=False)
     side_id = db.Column(db.Integer, db.ForeignKey('sides.side_id'))
-
+    lng_lat = db.Column(db.ARRAY(db.Numeric, dimensions=2), nullable=False)
     sides = db.relationship('Side', backref='locations')
     streets = db.relationship('Street', backref='locations')
 
@@ -137,6 +137,7 @@ class FaveLocation(db.Model):
     fl_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     loc_id = db.Column(db.Integer, db.ForeignKey('locations.loc_id'))
+    number_of_visits = db.Column(db.Integer, default=0)
 
     locations = db.relationship('Location', backref='fls')
     users = db.relationship('User', backref='fls')
@@ -148,7 +149,7 @@ class FaveLocation(db.Model):
                                                        self.user_id, 
                                                        self.loc_id)
 
-class MessagesToSend(db.Model):
+class MessageToSend(db.Model):
     """Messages waiting to be sent"""
 
     __tablename__ = "messages"
@@ -166,40 +167,6 @@ class MessagesToSend(db.Model):
                                                   self.user_id, 
                                                   self.time)
 
-
-def find_next_cleaning(street_cleanings):
-    """Returns date of next cleaning"""
-
-    pacific = pytz.timezone('US/Pacific')
-    now = datetime.now(tz=pacific)
-    day = now.strftime("%a")
-    if day == "Thu":
-        day = "Thur"
-    date = int(now.strftime("%d"))
-    week_of_mon = (date / 7) + 1
-
-    for cleaning in street_cleanings:
-        if cleaning.week_of_mon == week_of_mon and cleaning.day_id == day:
-            start_time = datetime.strptime(cleaning.start_time, '%H:%M')
-            end_time = datetime.strptime(cleaning.end_time, '%H:%M')
-            if int(end_time.strftime("%H")) > int(now.strftime("%H")):
-                if int(start_time.strftime("%H")) > int(now.strftime("%H")):
-                    hours = int(start_time.strftime("%H")) - int(now.strftime("%H"))
-                    return ["later today", hours]
-                elif int(end_time.strftime("%H")) < int(now.strftime("%H")):
-                    return "Street cleaning is now"
-        
-    while True:
-        now = now + timedelta(days=1)
-        day = now.strftime("%a")
-        if day == "Thu":
-            day = "Thur"
-        date = int(now.strftime("%d"))
-        week_of_mon = (date / 7) + 1
-        for cleaning in street_cleanings:
-            if cleaning.week_of_mon == week_of_mon and cleaning.day_id == day:
-                        # next_cleaning = cleaning
-                        return [now, cleaning]
         
 
 
