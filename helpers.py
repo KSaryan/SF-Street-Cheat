@@ -9,8 +9,10 @@ def find_next_cleaning(street_cleanings):
     pacific = pytz.timezone('US/Pacific')
     now = datetime.now(tz=pacific)
     day = now.strftime("%a")
-    if day == "Thu":
-        day = "Thur"
+    # if day == "Thu":
+    #     day = "Thur"
+    if day == "Tue":
+        day = "Tues"
     date = int(now.strftime("%d"))
     week_of_mon = (date / 7) + 1
 
@@ -30,8 +32,8 @@ def find_next_cleaning(street_cleanings):
     while True:
         now = now + timedelta(days=1)
         day = now.strftime("%a")
-        if day == "Thu":
-            day = "Thur"
+        # if day == "Thu":
+        #     day = "Thur"
         if day == "Tue":
             day = "Tues"
         date = int(now.strftime("%d"))
@@ -69,8 +71,8 @@ def get_sides_for_this_location(street, address):
         sides.append(location.sides.side_name)
     return sides
 
+
 def find_location(number, street, side):
-    import pdb; pdb.set_trace()
     street1 = Street.query.filter(Street.street_name == street).first()
     side1 = Side.query.filter(Side.side_name==side).first()
     if number % 2 == 0:

@@ -15,8 +15,9 @@ import re
 
 import os
 from helpers import *
-import math
+from math import radians, cos, sin, asin, sqrt
 from operator import itemgetter
+from decimal import Decimal
 
 
 
@@ -221,7 +222,7 @@ def find_nearby_cleanings():
     address = int(request.args.get("address"))
     street = (request.args.get("street")).replace("-", " ")
     side = request.args.get("side")
-    # current_location = find_location(address, street, side)
+    current_location = find_location(address, street, side)
     street = street.split(" ")
     address = str(address)
     address_string = street[0] + "+" + street[1] + "+" + address + "+San+Francisco+CA"
@@ -230,19 +231,34 @@ def find_nearby_cleanings():
     if response.status_code == 200:
         data = response.json()
         geolocation = data["results"][0]["geometry"]["location"]
-    locations = Location.query.all()
+    locations = Location.query.filter(Location.loc_id != current_location.loc_id).all()
     overall_distances = []
     for location in locations:
         distances = []
         for coordinate in location.lng_lat:
-            distance = math.sqrt((coordinate[1]-geolocation['lat'])**2 + (coordinate[0]-geolocation['lng'])**2)
-            distances.append([distance, coordinate])
+            coordinate = [float(coordinate[0]), float(coordinate[1])]
+            lon1, lat1, lon2, lat2 = map(radians, [coordinate[0], coordinate[1], geolocation['lng'], geolocation['lat']])
+            dlon = lon2 - lon1 
+            dlat = lat2 - lat1 
+            a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+            c = 2 * asin(sqrt(a)) 
+            km = 6367 * c
+# stance = math.sqrt((-Decimal())**2 + (-Decimal())**2)
+            distances.append([km, coordinate, location.loc_id])
         distances = sorted(distances, key=itemgetter(0))
-        best_distance = distances[-1]
+        best_distance = distances[1]
         overall_distances.append(best_distance)
     overall_distances = sorted(overall_distances, key=itemgetter(0))
-    closest_places = overall_distances[-5:]
-    return jsonify(closest_places)
+    closest_places = overall_distances[:20]
+    for place in closest_places:
+        street_cleanings = Cleaning.query.filter(Cleaning.loc_id==place[2]).all()
+        next_cleaning = find_next_cleaning(street_cleanings)
+        place[2]= next_cleaning[1]
+    results = {}
+    for i in range (len(closest_places)):
+        item = closest_places[i]
+        results[str(i)] = {"km": item[0], "coordinates": item[1], "message": item[2]}
+    return jsonify(results)
 
 
   
