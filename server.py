@@ -7,7 +7,7 @@ from sqlalchemy import update
 from model import (Location, Cleaning, Day, User, Side, 
                    Street, FaveLocation, MessageToSend, connect_to_db, db)
 import json
-from datetime import datetime, timedelta, date
+# from datetime import datetime, timedelta, date
 import bcrypt
 import pytz
 import requests
@@ -66,23 +66,26 @@ def verify_user():
 def create_user():
     """Creates new user in database"""
 
-    password = request.form.get("password")
+    password = request.form.get("password").rstrip()
     #not working
     # hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-    email = request.form.get("email")
+    email = request.form.get("email").rstrip()
     email = email.lower()
 
-    q = db.session.query(User).filter(User.email==email).first()
-    if q:
+    if db.session.query(User).filter(User.email==email).first():
         flash('There is already an email associated with this account. Please login.')
         return redirect('/')
     else:
-        user = User(password=password, email=email)
-        db.session.add(user)
-        db.session.commit()
-        session['login']= user.user_id
-        flash('Thank you for creating an account')
-        return redirect('/parking')
+        if len(email) > 30 or len(password) > 20:
+            flash('Password or email too long')
+            return redirect('/')
+        else:    
+            user = User(password=password, email=email)
+            db.session.add(user)
+            db.session.commit()
+            session['login']= user.user_id
+            flash('Thank you for creating an account')
+            return redirect('/parking')
 
 
 @app.route('/user_info')
@@ -101,26 +104,32 @@ def display_user_information():
 def update_user_info():
     """Updates User Information"""
 
-    email=request.form.get("email")
-    password=request.form.get("password")
-    number=request.form.get("number")
-    user=User.query.get(session['login'])
+    email = request.form.get("email")
+    password = request.form.get("password")
+    number = request.form.get("number")
+    user = User.query.get(session['login'])
     if email:
-        email=email.lower()
-        user.email=email
-        user.password=password
+        if len(email) > 30 or len(password) > 20:
+            flash('Password or email too long')
+        else:
+            email = email.lower()
+            user.email = email.rstrip()
+            user.password = password.rstrip()
+            flash('Information Updated')
+            
     
     if number:
-        number=number.replace("-", "")
-        number=number.replace(" ", "")
-        number=number.replace("(", "")
-        number=number.replace(")", "")
-        user.phone=number
+        number=re.sub("[\-\(\)\.\s]+", "", number)
+        if len(number) > 10:
+            flash("Invalid number")
+        else:
+            user.phone = number.rstrip()
+            flash('Information Updated')
+        
     
     db.session.add(user)
     db.session.commit()
 
-    flash('Information Updated')
     return redirect('/user_info')
 
 
@@ -141,27 +150,35 @@ def parking():
 def street_cleaning():
     """Returns time until street cleaning"""
 
-    number = int(request.args.get("address"))
+    number = request.args.get("address")
+    number = int(number)
     street = (request.args.get("street")).replace("-", " ")
     side = request.args.get("side")
-    location = find_location(number, street, side)
+    geolocation = find_geolocation(number, street)
+    if side == " " or side == None:
+        location = find_location(number, street)
+    else:
+        location = find_location(number,street, side)
     if location:
         faveloc = FaveLocation(user_id = session['login'], loc_id = location.loc_id)
         street_cleanings = Cleaning.query.filter(Cleaning.loc_id==location.loc_id).all()
 
-        next_cleaning = find_next_cleaning(street_cleanings)
+        next_cleaning = return_next_cleaning(street_cleanings)
         if next_cleaning[0] == "now":
             result = {"info_message": next_cleaning[0], 
-                      "message": next_cleaning[1]}
+                      "message": next_cleaning[1],
+                      "geolocation": geolocation}
 
         else:
             result = {"info_message": next_cleaning[0], 
                       "message": next_cleaning[1],
-                      "cleaning_time":next_cleaning[2]}
+                      "cleaning_time":next_cleaning[2],
+                      "geolocation": geolocation}
     else:
         message = "Not a valid address"
         result = {"info_messge": "not a valid address",
-                  "message": message}
+                  "message": message,
+                  "geolocation": geolocation}
 
 
     return jsonify(result)
@@ -202,7 +219,7 @@ def find_sides():
     return jsonify(sides_json)
 
 
-@app.route('/send_text', methods=["POST"])
+@app.route('/send_text.json', methods=["POST"])
 def send_text():
     """Creates a new message in the MessagesToSend table"""
 
@@ -212,61 +229,39 @@ def send_text():
         message = MessageToSend(user_id=session['login'], time= time)
         db.session.add(message)
         db.session.commit()
-        return "True"
+        result = {'info_message': 'True',
+                   'number': user.phone}
+        return jsonify(result)
     else:
         flash("You must have a phone number to get texts")
-        return "False"
+        result = {'info_message': 'False'}
+        return jsonify(result)
 
-@app.route('/nearby_cleanings')
+
+@app.route('/nearby_cleanings.json')
 def find_nearby_cleanings():
+    """returns nearby street cleanings with information needed for creating markers"""
+
     address = int(request.args.get("address"))
     street = (request.args.get("street")).replace("-", " ")
     side = request.args.get("side")
-    current_location = find_location(address, street, side)
-    street = street.split(" ")
-    address = str(address)
-    address_string = street[0] + "+" + street[1] + "+" + address + "+San+Francisco+CA"
-    url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ"%(address_string)
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        geolocation = data["results"][0]["geometry"]["location"]
-    locations = Location.query.filter(Location.loc_id != current_location.loc_id).all()
-    overall_distances = []
-    for location in locations:
-        distances = []
-        for coordinate in location.lng_lat:
-            coordinate = [float(coordinate[0]), float(coordinate[1])]
-            lon1, lat1, lon2, lat2 = map(radians, [coordinate[0], coordinate[1], geolocation['lng'], geolocation['lat']])
-            dlon = lon2 - lon1 
-            dlat = lat2 - lat1 
-            a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-            c = 2 * asin(sqrt(a)) 
-            km = 6367 * c
-# stance = math.sqrt((-Decimal())**2 + (-Decimal())**2)
-            distances.append([km, coordinate, location.loc_id])
-        distances = sorted(distances, key=itemgetter(0))
-        best_distance = distances[1]
-        overall_distances.append(best_distance)
-    overall_distances = sorted(overall_distances, key=itemgetter(0))
-    closest_places = overall_distances[:20]
+    closest_places = find_nearby_places(address, street, side)
+    #replacing loc_id with message about when street cleaning is
     for place in closest_places:
-        street_cleanings = Cleaning.query.filter(Cleaning.loc_id==place[2]).all()
-        next_cleaning = find_next_cleaning(street_cleanings)
+        loc_id = place[2]
+        street_cleanings = Cleaning.query.filter(Cleaning.loc_id==loc_id).all()
+        next_cleaning = return_next_cleaning(street_cleanings)
         place[2]= next_cleaning[1]
+    #putting information in an organized dictionary
     results = {}
     for i in range (len(closest_places)):
         item = closest_places[i]
-        results[str(i)] = {"km": item[0], "coordinates": item[1], "message": item[2]}
+        message = "Try parking on %s. %s." %(item[3], item[2])
+        results[str(i)] = {"km": item[0], "coordinates": item[1], "message": message }
     return jsonify(results)
-
 
   
 if __name__ == "__main__":
-    # We have to set debug=True here, since it has to be True at the
-    # point that we invoke the DebugToolbarExtension
-    app.debug = True
-    app.jinja_env.auto_reload = app.debug  # make sure templates, etc. are not cached in debug mode
 
     connect_to_db(app)
 

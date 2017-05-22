@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from model import Location, Cleaning, Day, User, FaveLocation, Street, Side
+from model import Location, Cleaning, Day, User, FaveLocation, Street, Side, Neighborhood
 #remove this when import app
 from flask import Flask
 from model import connect_to_db, db
@@ -15,7 +15,7 @@ def create_days():
     Day.query.delete()
 
     mon = Day(day_id="Mon", day_name="Monday")
-    tue = Day(day_id="Tues", day_name="Tuesday")
+    tue = Day(day_id="Tue", day_name="Tuesday")
     wed = Day(day_id="Wed", day_name="Wednesday")
     thu = Day(day_id="Thu", day_name="Thursday")
     fri = Day(day_id="Fri", day_name="Friday")
@@ -40,41 +40,51 @@ def create_cleanings():
         data = response.json()
 
         for item in data:
-            if Street.query.filter_by(street_name=item["streetname"]).first():
-                s = Street.query.filter_by(street_name=item["streetname"]).first()
-            else:
+            #add street to streets table
+            s = Street.query.filter_by(street_name=item["streetname"]).first()
+            if s is None:
                 s = Street(street_name=item["streetname"])
                 db.session.add(s)
                 db.session.commit()
+
+            #add neighborhood to neighborhoods table
+            n = Neighborhood.query.filter_by(n_name=item["nhood"]).first()
+            if n is None:
+                n = Neighborhood(n_name=item["nhood"])
+                db.session.add(n)
+                db.session.commit()
+
+            #add side to sides table
             if "blockside" in item:
-                if Side.query.filter_by(side_name=item["blockside"]).first():
-                    side = Side.query.filter_by(side_name=item["blockside"]).first()
-                    side_id = side.side_id
-                else:
+                side = Side.query.filter_by(side_name=item["blockside"]).first()  
+                if side is None:
                     side = Side(side_name=item["blockside"])
                     db.session.add(side)
                     db.session.commit()
-                    side_id = side.side_id
+                side_id = side.side_id
             else:
                 side_id = None
 
-            if Location.get_unique(s.street_id, item["rt_toadd"], item["lf_toadd"], side_id):
-                location = Location(street_id=s.street_id, rt_from_address=item["rt_fadd"],
+            #add location to locations table
+            location=db.session.query(Location).filter(Location.street_id==s.street_id, Location.rt_from_address==item["rt_fadd"],
+                                    Location.rt_to_address==item["rt_toadd"], Location.lt_from_address==item["lf_fadd"],
+                                    Location.lt_to_address==item["lf_toadd"], Location.side_id==side_id).first()
+            if location is None:
+                location = Location(street_id=s.street_id, n_id=n.n_id, rt_from_address=item["rt_fadd"],
                                     rt_to_address=item["rt_toadd"], lt_from_address=item["lf_fadd"],
                                     lt_to_address=item["lf_toadd"], side_id=side_id,
                                     lng_lat = item["geometry"]["coordinates"])
                 db.session.add(location)
                 db.session.commit()
-
-            else:
-                location=db.session.query(Location).filter(Location.street_id==s.street_id, Location.rt_from_address==item["rt_fadd"],
-                                    Location.rt_to_address==item["rt_toadd"], Location.lt_from_address==item["lf_fadd"],
-                                    Location.lt_to_address==item["lf_toadd"], Location.side_id==side.side_id).first()
+                
 
             day_id =item["weekday"]
 
             if day_id == "Holiday":
                 day_id = "Hol"
+
+            if day_id == "Tues":
+                day_id = "Tue"
 
             if item["week1ofmon"] == "Y":
                 cleaning1 = Cleaning(day_id = day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 1, locations=location)

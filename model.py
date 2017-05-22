@@ -34,6 +34,20 @@ class Side(db.Model):
         return "<%s>"%(self.side_name)
 
 
+class Neighborhood(db.Model):
+    """Neighborhoods"""
+
+    __tablename__ = "neighborhoods"
+
+    n_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    n_name = db.Column(db.String(25), nullable=False)
+
+    def __repr__ (self):
+        """Displayed when called"""
+
+        return "<%s>"%(self.n_name)
+
+
 class Location(db.Model):
     """Specific address."""
 
@@ -41,14 +55,17 @@ class Location(db.Model):
 
     loc_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     street_id = db.Column(db.Integer, db.ForeignKey('streets.street_id'))
+    n_id = db.Column(db.Integer, db.ForeignKey('neighborhoods.n_id'))
     rt_from_address = db.Column(db.Integer, nullable=False)
     rt_to_address = db.Column(db.Integer, nullable=False)
     lt_from_address = db.Column(db.Integer, nullable=False)
     lt_to_address = db.Column(db.Integer, nullable=False)
     side_id = db.Column(db.Integer, db.ForeignKey('sides.side_id'))
     lng_lat = db.Column(db.ARRAY(db.Numeric, dimensions=2), nullable=False)
+    
     sides = db.relationship('Side', backref='locations')
     streets = db.relationship('Street', backref='locations')
+    neighborhoods = db.relationship('Neighborhood', backref='neighborhoods')
 
     def __repr__ (self):
         """Displayed when called"""
@@ -59,19 +76,21 @@ class Location(db.Model):
                                                         self.lt_to_address,
                                                         self.loc_id)
 
-    @classmethod
-    def get_unique(cls, street_id, rt_to_address, lt_to_address, side_id):
-        cache = db.session._unique_cache = getattr(db.session, '_unique_cache', {})
+    # @classmethod
+    # def get_unique(cls, street_id, rt_to_address, lt_to_address, side_id):
+    #     """Checks if location already in table"""
 
-        key = (cls, street_id, rt_to_address, lt_to_address, side_id)
-        o = cache.get(key)
-        if o is None:
-            o = db.session.query(cls).filter(cls.street_id==street_id, 
-                                          cls.rt_to_address==rt_to_address, 
-                                          cls.lt_to_address==lt_to_address,
-                                          cls.side_id==side_id).first()
-            if o is None:
-                return True
+    #     # cache = db.session._unique_cache = getattr(db.session, '_unique_cache', {})
+
+    #     # key = (cls, street_id, rt_to_address, lt_to_address, side_id)
+    #     # o = cache.get(key)
+    #     # if o is None:
+    #     o = db.session.query(cls).filter(cls.street_id==street_id, 
+    #                                       cls.rt_to_address==rt_to_address, 
+    #                                       cls.lt_to_address==lt_to_address,
+    #                                       cls.side_id==side_id).first()
+    #     if o is None:
+    #         return True
 
 
 class Cleaning(db.Model):
@@ -167,13 +186,69 @@ class MessageToSend(db.Model):
                                                   self.user_id, 
                                                   self.time)
 
-        
+def example_data():
+    user = User(email = "kristine", password = "boo")
+    user2 = User(email = "kristine", password = "boo", phone='8183333333')
+    street = Street(street_id = 1, street_name = "California")
+    street2 = Street(street_id = 2, street_name = "Sacramento")
+    street3 = Street(street_id = 3, street_name = "Lake")
+    side = Side(side_id = 1, side_name = "North")
+    side2 = Side(side_id = 2, side_name = "South")
+    location = Location (loc_id = 1, street_id = 1, 
+                         rt_from_address = 0,
+                         rt_to_address = 100,
+                         lt_from_address = 1,
+                         lt_to_address = 1001,
+                         side_id = 1,
+                         lng_lat = [[38, -12], [38, -12]])
+    location2 = Location (loc_id = 2, street_id = 2, 
+                         rt_from_address = 0,
+                         rt_to_address = 100,
+                         lt_from_address = 1,
+                         lt_to_address = 1001,
+                         side_id = 2,
+                         lng_lat = [[38, -12], [38, -12]])
+    location3 = Location (loc_id = 3, street_id = 2, 
+                         rt_from_address = 5000,
+                         rt_to_address = 5006,
+                         lt_from_address = 5001,
+                         lt_to_address = 5007,
+                         side_id = 2,
+                         lng_lat = [[38, -12], [38, -12]])
+    location4 = Location (loc_id = 4, street_id = 3, 
+                         rt_from_address = 0,
+                         rt_to_address = 100,
+                         lt_from_address = 1,
+                         lt_to_address = 1001,
+                         lng_lat = [[38, -12], [38, -12]])
+    cleaning = Cleaning(loc_id = 1,
+                        start_time = '19:00',
+                        end_time = '20:00',
+                        week_of_mon = 3,
+                        day_id = 'Thu')
+    cleaning2 = Cleaning(loc_id = 2,
+                        start_time = '8:00',
+                        end_time = '13:00',
+                        week_of_mon = 3,
+                        day_id = 'Fri')
+    cleaning3 = Cleaning(loc_id = 3,
+                        start_time = '8:00',
+                        end_time = '20:00',
+                        week_of_mon = 3,
+                        day_id = 'Thu')
 
+    day = Day(day_id = 'Thu', day_name = 'Thursday')
+    day2 = Day(day_id = 'Fri', day_name ='Friday')
+    db.session.add_all([day, day2, cleaning, cleaning2, 
+                        location, location2, side, street, 
+                        user, street2, side2, location3,
+                        cleaning3, user2, street3, location4])
+    db.session.commit()
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri = "postgres:///parking"):
     """Connect the database to Flask app."""
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///parking'
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_ECHO'] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app

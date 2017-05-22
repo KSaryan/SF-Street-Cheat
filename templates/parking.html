@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<div id='forms'>
 <h1>How Long Until Street Cleaning</h1>
 <button id='currentlocation'>Use Current Location</button>
 <p>
     <form id="adressinfo">
-        Number: <input type= "text" name="address" id="address" required="True"><br>
+        Number: <input type="text" name="address" id="address" required="True"><br>
         
         Street: <select name="street" id="street" required="True">
             <option value = ' '>  </option>
@@ -31,7 +31,7 @@
     </form>
 </p>
 
-<button id="locationsbtn">Nearby Places</button>
+<button id="locationsbtn">Parking in my Neighborhood</button>
 <div id="locations"></div>
 
 <div id="timeleft"></div>
@@ -53,6 +53,7 @@
         <input type="submit" value="User Information">
     </form>
 </p>
+</div>
 
 <div id='map'></div>
 

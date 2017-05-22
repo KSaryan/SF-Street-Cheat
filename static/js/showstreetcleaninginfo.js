@@ -11,6 +11,10 @@ function displayStreetCleaningResults(result){
     }
         
     $('#timeleft').html(result["message"]);
+    var latlng = {'lat': result['geolocation']['lat'], 
+                  'lng': result['geolocation']['lng']}
+    map.setCenter(latlng);
+    infoWindow.setPosition(latlng);
 }
 
 function submitAddress(evt){
