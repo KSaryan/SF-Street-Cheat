@@ -28,15 +28,29 @@ function showLocations(result){
       }
       var marker = new google.maps.Marker({map: map,
                                            position: myLatLng,
-                                           title: text.toString()
+                                           title: text.toString(),
+                                           category: 0
                                           });
       allMarkers.push(marker)
+
+      var infowindow = new google.maps.InfoWindow({
+          content: text.toString()
+      });
+
+      google.maps.event.addListener(marker,'click', (function(marker,text,infowindow){ 
+        return function() {
+          infowindow.setContent(text);
+          infowindow.open(map,marker);
+      };
+
+      })(marker,text.toString(),infowindow)); 
     }
+
   var bounds = new google.maps.LatLngBounds();
   for (var i = 0; i < allMarkers.length; i++) {
     bounds.extend(allMarkers[i].getPosition());
 }
-  map.setOptions({ minZoom: 15, maxZoom: 20});
+  map.setOptions({ minZoom: 13, maxZoom: 20});
   map.fitBounds(bounds);
 }
 

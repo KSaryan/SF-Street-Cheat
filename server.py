@@ -57,15 +57,13 @@ def verify_user():
     password = request.form.get("password")
     email = request.form.get("email")
     email = email.lower()
-    #  if bcrypt.checkpw(password, hashed):
-    #     print("It Matches!")
-    # else:
-    #     print("It Does not Match :(")
-    q = db.session.query(User).filter(User.email==email, User.password==password).first()
-
+    q = db.session.query(User).filter(User.email==email).first()
     if q:
-        session['login'] = q.user_id
-        return redirect('/parking')
+        password = password.encode('utf8') 
+        hashedpass = q.password.encode('utf8') 
+        if bcrypt.checkpw(password, hashedpass):
+            session['login'] = q.user_id
+            return redirect('/parking')
     else:
         flash("Username or password not found")
         return redirect ('/')
@@ -75,8 +73,8 @@ def verify_user():
 def create_user():
     """Creates new user in database"""
 
-    password = request.form.get("password").encode('utf8') 
-    # password_for_b = password
+    password = request.form.get("password").rstrip()
+    password = password.encode('utf8') 
     hashed = bcrypt.hashpw(password, bcrypt.gensalt())
     email = request.form.get("email").rstrip()
     email = email.lower()
@@ -87,7 +85,7 @@ def create_user():
         flash('There is already an email associated with this account. Please login.')
         return redirect('/login')
     else:
-        if len(email) > 30 or len(password) > 20:
+        if len(email) > 30:
             flash('Password or email too long')
             return redirect('/login')
         if len(phone) != 10:
@@ -123,12 +121,15 @@ def update_user_info():
     number = request.form.get("number")
     user = User.query.get(session['login'])
     if email:
-        if len(email) > 30 or len(password) > 20:
+        if len(email) > 30:
             flash('Password or email too long')
         else:
             email = email.lower()
             user.email = email.rstrip()
-            user.password = password.rstrip()
+            password = password.rstrip()
+            password = password.encode('utf8') 
+            hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+            user.password = hased
             flash('Information Updated')
             
     

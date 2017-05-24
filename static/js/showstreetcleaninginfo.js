@@ -75,4 +75,4 @@ function getCordinates(){
 })
 }
 
-$('#currentlocation').on('click', getCordinates)
+$(document).ready(getCordinates)

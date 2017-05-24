@@ -13,7 +13,6 @@
 
 <div id='forms'>
     <h1>How Long Until Street Cleaning</h1>
-    <button id='currentlocation'>Use Current Location</button>
     <p>
         <form id="adressinfo">
             Number: <input type="text" name="address" id="address" required="True"><br>
@@ -53,6 +52,18 @@
         <a href='/login' id="logintextbtn"><button>Login to Get Text Reminders</button></a>
     {% endif %}
     <button id="locationsbtn">Parking in my Neighborhood</button>
+    
+    <button id="filterbtn" class="hidden">Filter</button>
+    <form name="filterform" id="filterform" class="hidden">
+        I'm parking for: <select name="filteroptions" id="filteroptions" required="True">
+                            <option value = '1'>two hours</option>
+                            <option value = '2'>until tomorrow</option>
+                            <option value = '3'>two days</option>
+                            <option value = '4'>a week</option>
+                        </select>
+        <input type="submit" name="submit">
+    </form>
+
 
 </div>
 
@@ -67,5 +78,6 @@
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ&callback=initMap"></script>
 <script type="text/javascript" src="/static/js/sendtext.js"></script>
 <script type="text/javascript" src='/static/js/markers.js'></script>
+<script type="text/javascript" src='/static/js/filter.js'></script>
 {% endblock %}
 

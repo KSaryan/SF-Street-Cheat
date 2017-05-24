@@ -157,7 +157,7 @@ def find_nearby_places(address, street, side):
       best_distance = distances[1]
       overall_distances.append(best_distance)
   overall_distances = sorted(overall_distances, key=itemgetter(0))
-  closest_places = overall_distances[:15]
+  closest_places = overall_distances[:25]
   return closest_places
 
 
