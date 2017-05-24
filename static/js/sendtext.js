@@ -1,7 +1,7 @@
 function completed(result){
     if (result["info_message"] == "True"){
         number ='(' + result["number"].slice(0, 3) + ')' + result["number"].slice(3, 6) + '-' + result["number"].slice(6,)
-        alert("Message will be sent to " + number);
+        alert("Message will be sent to " + number +" before street cleaning");
     }else{
         $(location).attr('href', '/user_info')
     }

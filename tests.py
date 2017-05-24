@@ -17,18 +17,19 @@ class MyAppUnitTestCase(TestCase):
     def tearDown(self):
         """Do at end of every test."""
 
-        db.drop_all()
         db.session.close()
+        db.drop_all()
+        
 
-    def test_get_sides(TestCase):
-        assert helpers.get_sides_for_this_location('California', '50') == 'North'
+    def test_get_sides(self):
+        self.assertEqual(helpers.get_sides_for_this_location('California', '50'), ['North'])
 
-    def test_find_next_cleaning(self):
-        cleanings = Cleaning.query.get(1)
-        assert helpers.find_nect_cleaning(cleanings, now) == "blag"
-#     def test_find_location(self):
-#         assert helpers.find_location(50, 'California', 'North') == '<rt: 0-100, lt: 1-1001 for loc: 1>'
-#         # assert helpers.find_location(50, 'Lake') == object
+    # def test_find_next_cleaning(self):
+    #     cleanings = Cleaning.query.get(1)
+    #     assert helpers.find_nect_cleaning(cleanings, now) == "blag"
+    def test_find_location(self):
+        self.assertEqual(str(helpers.find_location(50, 'California', 'North')), '<rt: 0-100, lt: 1-1001 for loc: 1>')
+        # assert helpers.find_location(50, 'Lake') == object
 
 class TestRoutesLogedIn(TestCase):
     def setUp(self):

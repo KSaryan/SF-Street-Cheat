@@ -1,58 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div id='forms'>
-<h1>How Long Until Street Cleaning</h1>
-<button id='currentlocation'>Use Current Location</button>
-<p>
-    <form id="adressinfo">
-        Number: <input type="text" name="address" id="address" required="True"><br>
-        
-        Street: <select name="street" id="street" required="True">
-            <option value = ' '>  </option>
-            {% for street in streets %}
-                <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <br>
-        <br>
-        <div id="sidediv">
-        Please Choose Side of Street: <select name="side" id="side" required="True">
-            <option value= " ">  </option>
-            {% for side in sides %}
-                <option value={{ side.side_name }} id = {{ side.side_name }} class = 'hidden sides'>{{ side.side_name }}</option>
-            {% endfor %}
-        </select>
-        </div>
-        <br>
-
-        <button id="addressbtn">When is Street Cleaning?</button>
-    </form>
-</p>
-
-<button id="locationsbtn">Parking in my Neighborhood</button>
-<div id="locations"></div>
-
-<div id="timeleft"></div>
-
-
-<form id="gettext">
-    <input name="cleaningtime" id="cleaningtime" type="hidden">
-    <input type="submit" name="submit" value="Get A Text Reminder">
-</form>
-
-<p>
+{% if email %}
+    Welcome <a href='/user_info'><button>{{ email }}</button></a>
+    <a href='/my_places'><button>My Places</button></a>
     <form action='/' method="POST">
         <input type='submit' value='logout'>
     </form>
-</p>
+{% else %}
+    <a href='/login'><button>Login</button></a>
+{% endif %}
 
-<p>
-    <form action="/user_info">
-        <input type="submit" value="User Information">
-    </form>
-</p>
+<div id='forms'>
+    <h1>How Long Until Street Cleaning</h1>
+    <button id='currentlocation'>Use Current Location</button>
+    <p>
+        <form id="adressinfo">
+            Number: <input type="text" name="address" id="address" required="True"><br>
+            
+            Street: <select name="street" id="street" required="True">
+                <option value = ' '>  </option>
+                {% for street in streets %}
+                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <br>
+            <br>
+            <div id="sidediv">
+            Please Choose Side of Street: <select name="side" id="side" required="True">
+                <option value= " ">  </option>
+                {% for side in sides %}
+                    <option value={{ side.side_name }} id = {{ side.side_name }} class = 'hidden sides'>{{ side.side_name }}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <br>
+
+            <button id="addressbtn">When is Street Cleaning?</button>
+        </form>
+    </p>
+
+
+    <div id="timeleft"></div>
+
+    {% if 'login' in session %}
+        <form id="gettext">
+            <input name="cleaningtime" id="cleaningtime" type="hidden">
+            <input type="submit" name="submit" value="Get A Text Reminder">
+        </form>
+    {% else %}
+        <a href='/login' id="logintextbtn"><button>Login to Get Text Reminders</button></a>
+    {% endif %}
+    <button id="locationsbtn">Parking in my Neighborhood</button>
+
 </div>
 
 <div id='map'></div>
@@ -65,6 +66,6 @@
 <script async defer
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ&callback=initMap"></script>
 <script type="text/javascript" src="/static/js/sendtext.js"></script>
-<script type="text/javascript" src='/static/js/locations.js'></script>
+<script type="text/javascript" src='/static/js/markers.js'></script>
 {% endblock %}
 

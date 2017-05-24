@@ -77,7 +77,6 @@ def return_next_cleaning(street_cleanings):
 
 def get_sides_for_this_location(street, address):
     """returns sides of street associated with unique location"""
-
     street1 = Street.query.filter_by(street_name = street).first()
     if int(address) % 2 == 0:
         locations = Location.query.filter(Location.street_id==street1.street_id,
@@ -160,4 +159,19 @@ def find_nearby_places(address, street, side):
   overall_distances = sorted(overall_distances, key=itemgetter(0))
   closest_places = overall_distances[:15]
   return closest_places
+
+
+def add_fave_location(user_id, loc_id, type_id, address):
+  """adds new saved favorite location for user or updates existing"""
+  
+  fl = FaveLocation.query.filter(FaveLocation.user_id==user_id, FaveLocation.type_id==type_id).first()
+  if fl:
+    fl.loc_id = loc_id
+    fl.address = address
+  else:
+    fl = FaveLocation(user_id=user_id, loc_id=loc_id, type_id=type_id, address=address)
+  
+  db.session.add(fl)
+  db.session.commit()
+
 

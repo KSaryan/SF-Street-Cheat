@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from model import Location, Cleaning, Day, User, FaveLocation, Street, Side, Neighborhood
+from model import Location, Cleaning, Day, User, FaveLocation, Street, Side, Neighborhood, Type
 #remove this when import app
 from flask import Flask
 from model import connect_to_db, db
@@ -24,6 +24,21 @@ def create_days():
     hol = Day(day_id="Hol", day_name="Holiday")
 
     db.session.add_all([mon, tue, wed, thu, fri, sat, sun, hol])
+    db.session.commit()
+
+
+def create_types():
+    """creates types in the types table"""
+
+    print "Types"
+
+    Type.query.delete()
+
+    hom = Type(type_id="hom", type_name="home")
+    wor = Type(type_id="wor", type_name="work")
+    las = Type(type_id="las", type_name="last")
+
+    db.session.add_all([hom, wor, las])
     db.session.commit()
 
 
@@ -105,31 +120,6 @@ def create_cleanings():
     db.session.commit()
 
 
-# def create_user(email, password, phone=None):
-#     """Creates new user"""
-
-#     user=User(email=email, password=password, phone=phone)
-#     db.session.add(user)
-#     db.session.commit()
-
-
-# def add_number(email, phone):
-#     """updates user's phone number"""
-
-#     user = db.session.query(User).filter_by(email=email).first()
-#     user.phone=phone
-#     #should I add here?
-#     db.session.add(user)
-#     db.session.commit()
-
-
-def add_fave_location(user_id, loc_id):
-    """adds new saved favorite location for user"""
-
-    fave_location = FaveLocation(user_id=user_id, loc_id=loc_id)
-    db.session.add(fave_location)
-    db.session.commit()
-
 
 if __name__ == "__main__":
     #later can import app from server
@@ -139,6 +129,7 @@ if __name__ == "__main__":
 
     
     create_days()
+    create_types()
     create_cleanings()
 
 

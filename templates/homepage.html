@@ -1,26 +1,16 @@
-
 {% extends 'base.html' %}
 {% block content %}
-<p>
-    Welcome! Login to use.
-</p>
+<a href="/login"><button>Log In</button></a>
 
-<p>
-    <h2>Login</h2>
-    <form action='/verify_user' method="POST">
-        Email: <input type="text" name="email" required="True">
-        Password: <input type="password" name="password" required="True">
-        <input type="submit" name="submit">
-    </form>
-</p>
+<h3>
+    Don't Let Street Cleaning Ruin Your Day
+</h3>
 
-<p>
-    <h2>Register</h2>
-    <form action='/create_user' method="POST">
-        Email: <input type="text" name="email" required="True">
-        Password: <input type="text" name="password" required="True">
-        <input type="submit" name="submit">
-    </form>
-</p>
+<a href='/parking'> <button> Carefree Parking</button></a>
 
+or 
+
+<a href="/login"><button>Log In</button></a>
+
+   
 {% endblock %}

@@ -27,9 +27,8 @@ app.secret_key = "ABC"
 @app.route('/')
 def homepage():
     """Displays homepage with login form"""
-
     if 'login' in session:
-        return redirect('/parking')
+        return redirect ('/parking')
     else:
         return render_template('homepage.html')
 
@@ -44,6 +43,13 @@ def log_out():
     return redirect ('/')
 
 
+@app.route('/login')
+def log_in():
+    """Displays login page"""
+
+    return render_template('login.html')
+
+
 @app.route('/verify_user', methods=["POST"])
 def verify_user():
     """Verifies users email and password"""
@@ -51,7 +57,10 @@ def verify_user():
     password = request.form.get("password")
     email = request.form.get("email")
     email = email.lower()
-
+    #  if bcrypt.checkpw(password, hashed):
+    #     print("It Matches!")
+    # else:
+    #     print("It Does not Match :(")
     q = db.session.query(User).filter(User.email==email, User.password==password).first()
 
     if q:
@@ -66,21 +75,26 @@ def verify_user():
 def create_user():
     """Creates new user in database"""
 
-    password = request.form.get("password").rstrip()
-    #not working
-    # hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+    password = request.form.get("password").encode('utf8') 
+    # password_for_b = password
+    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
     email = request.form.get("email").rstrip()
     email = email.lower()
+    phone = request.form.get("phone")
+    phone = re.sub("[\-\(\)\.\s]+", "", phone)
 
     if db.session.query(User).filter(User.email==email).first():
         flash('There is already an email associated with this account. Please login.')
-        return redirect('/')
+        return redirect('/login')
     else:
         if len(email) > 30 or len(password) > 20:
             flash('Password or email too long')
-            return redirect('/')
+            return redirect('/login')
+        if len(phone) != 10:
+            flash("Invalid number. Make sure to include area code.")
+            return redirect('/login')
         else:    
-            user = User(password=password, email=email)
+            user = User(password=hashed, email=email, phone=phone)
             db.session.add(user)
             db.session.commit()
             session['login']= user.user_id
@@ -97,7 +111,7 @@ def display_user_information():
         return render_template('user_info.html', user=user)
     else:
         flash("Please login in to view")
-        return redirect ('/')
+        return redirect ('/login')
 
 
 @app.route('/update_user', methods=["POST"])
@@ -120,8 +134,8 @@ def update_user_info():
     
     if number:
         number=re.sub("[\-\(\)\.\s]+", "", number)
-        if len(number) > 10:
-            flash("Invalid number")
+        if len(number) != 10:
+            flash("Invalid number. Make sure to include area code.")
         else:
             user.phone = number.rstrip()
             flash('Information Updated')
@@ -140,27 +154,30 @@ def parking():
     streets = Street.query.order_by(Street.street_name.asc()).all()
     sides = Side.query.all()
     if 'login' in session:
-        return render_template('parking.html', streets=streets, sides=sides)
+        user = User.query.get(session['login']) 
+        email = user.email
     else:
-        flash("Please login")
-        return redirect('/')
+        email = None
+    return render_template('parking.html', streets=streets, sides=sides, email=email)
 
 
 @app.route('/street_cleaning.json')
 def street_cleaning():
     """Returns time until street cleaning"""
 
-    number = request.args.get("address")
-    number = int(number)
+    address = request.args.get("address")
+    address = int(address)
     street = (request.args.get("street")).replace("-", " ")
     side = request.args.get("side")
-    geolocation = find_geolocation(number, street)
+    geolocation = find_geolocation(address, street)
     if side == " " or side == None:
-        location = find_location(number, street)
+        location = find_location(address, street)
     else:
-        location = find_location(number,street, side)
+        location = find_location(address,street, side)
     if location:
-        faveloc = FaveLocation(user_id = session['login'], loc_id = location.loc_id)
+        if 'login' in session:
+            add_fave_location(session['login'], location.loc_id, 'las', address)
+
         street_cleanings = Cleaning.query.filter(Cleaning.loc_id==location.loc_id).all()
 
         next_cleaning = return_next_cleaning(street_cleanings)
@@ -259,6 +276,60 @@ def find_nearby_cleanings():
         message = "Try parking on %s. %s." %(item[3], item[2])
         results[str(i)] = {"km": item[0], "coordinates": item[1], "message": message }
     return jsonify(results)
+
+@app.route('/add_fave_loc')
+def add_a_fave():
+    street = request.args.get('street').replace("-", " ")
+    address = int(request.args.get('address'))
+    side = request.args.get('side')
+    typefave = request.args.get ('type')
+    if side == " " or side == None:
+        location = find_location(address, street)
+    else:
+        location = find_location(address,street, side)
+    add_fave_location(session['login'], location.loc_id, typefave, address)
+    return redirect('/my_places')
+
+
+@app.route('/my_places')
+def my_places():
+    home = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='hom').first()
+    if home:
+        home_location = Location.query.filter(Location.loc_id ==home.loc_id).first()
+        street = Street.query.filter(Street.street_id == home_location.street_id).first()
+        home_street = street.street_name
+        home_address = home.address
+        home_cleanings = Cleaning.query.filter(Cleaning.loc_id==home.loc_id).all()
+        home_next_cleaning = return_next_cleaning(home_cleanings)[1]
+        home = [home_address, home_street, home_next_cleaning]
+    work = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='wor').first()
+    if work:
+        work_location = Location.query.filter(Location.loc_id == work.loc_id).first()
+        street = Street.query.filter(Street.street_id == work_location.street_id).first()
+        work_street = street.street_name
+        work_address = work.address
+        work_cleanings = Cleaning.query.filter(Cleaning.loc_id==work.loc_id).all()
+        work_next_cleaning = return_next_cleaning(work_cleanings)[1]
+        work = [work_address, work_street, work_next_cleaning]
+    recent = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='las').first()
+    if recent:
+        recent_location = Location.query.filter(Location.loc_id==recent.loc_id).first()
+        street = Street.query.filter(Street.street_id == recent_location.street_id).first()
+        recent_street = street.street_name
+        recent_address = recent.address
+        recent_cleanings = Cleaning.query.filter(Cleaning.loc_id==recent.loc_id).all()
+        recent_next_cleaning = return_next_cleaning(recent_cleanings)[1]
+        recent = [recent_address, recent_street, recent_next_cleaning]
+
+    streets = Street.query.order_by(Street.street_name.asc()).all()
+    sides = Side.query.all()
+
+    return render_template('/myplaces.html', 
+                           recent=recent, 
+                           work=work, 
+                           home=home, 
+                           streets=streets, 
+                           sides=sides)
 
   
 if __name__ == "__main__":

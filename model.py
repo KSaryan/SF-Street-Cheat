@@ -76,22 +76,6 @@ class Location(db.Model):
                                                         self.lt_to_address,
                                                         self.loc_id)
 
-    # @classmethod
-    # def get_unique(cls, street_id, rt_to_address, lt_to_address, side_id):
-    #     """Checks if location already in table"""
-
-    #     # cache = db.session._unique_cache = getattr(db.session, '_unique_cache', {})
-
-    #     # key = (cls, street_id, rt_to_address, lt_to_address, side_id)
-    #     # o = cache.get(key)
-    #     # if o is None:
-    #     o = db.session.query(cls).filter(cls.street_id==street_id, 
-    #                                       cls.rt_to_address==rt_to_address, 
-    #                                       cls.lt_to_address==lt_to_address,
-    #                                       cls.side_id==side_id).first()
-    #     if o is None:
-    #         return True
-
 
 class Cleaning(db.Model):
     """Individdual cleanings"""
@@ -138,7 +122,7 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(30), nullable=False)
-    password = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(11))
 
     def __repr__ (self):
@@ -154,12 +138,14 @@ class FaveLocation(db.Model):
     __tablename__ = "favelocations"
 
     fl_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    address = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     loc_id = db.Column(db.Integer, db.ForeignKey('locations.loc_id'))
-    number_of_visits = db.Column(db.Integer, default=0)
+    type_id = db.Column(db.String(3), db.ForeignKey('types.type_id'))
 
     locations = db.relationship('Location', backref='fls')
     users = db.relationship('User', backref='fls')
+    types = db.relationship('Type', backref='fls')
 
     def __repr__ (self):
         """Displayed when called"""
@@ -167,6 +153,20 @@ class FaveLocation(db.Model):
         return "<fl-id: %s, user-id: %s, loc-id: %s>"%(self.fl_id, 
                                                        self.user_id, 
                                                        self.loc_id)
+
+class Type(db.Model):
+    """Types of favorite places"""
+
+    __tablename__ = "types"
+
+    type_id = db.Column(db.String(3), primary_key=True)
+    type_name = db.Column (db.String(4), nullable=False)
+
+    def __repr__ (self):
+        """Displayed when called"""
+
+        return "<%s>"%(self.type_name)
+
 
 class MessageToSend(db.Model):
     """Messages waiting to be sent"""

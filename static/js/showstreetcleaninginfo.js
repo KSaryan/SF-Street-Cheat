@@ -1,5 +1,7 @@
-// hiding gettest div
-$('#gettext').toggle()
+$('#gettext').toggle();
+$('#locationsbtn').toggle();
+$('#logintextbtn').toggle();
+
 
 
 function displayStreetCleaningResults(result){
@@ -8,6 +10,8 @@ function displayStreetCleaningResults(result){
     if(result["info_message"] == "today" || result["info_message"] == "another day"){
         $('#cleaningtime').val(result["cleaning_time"]);
         $('#gettext').fadeIn();
+        $('#locationsbtn').fadeIn();
+        $('#logintextbtn').fadeIn();
     }
         
     $('#timeleft').html(result["message"]);
@@ -31,37 +35,34 @@ function submitAddress(evt){
 $('#addressbtn').on('click', submitAddress)
 
 
-function findingSides(list_of_sides){
+function findingSides2(result){
+    var listOfSides = result["sides"];
     $('#sidediv').fadeOut();
     $('.sides').addClass('hidden');
-    for (var i=0; i< list_of_sides.length; i++){
-        var sideId = '#' + list_of_sides[i];
+    for (var i=0; i< listOfSides.length; i++){
+        var sideId = '#' + listOfSides[i];
         $(sideId).removeClass('hidden'); 
     }
     $('#sidediv').fadeIn();
 }
 
-
-function displaySides(result){
-    findingSides(result["sides"]);
-}
         
-function streetSide(){
+function streetSide2(){
      var addressInputs = {
         "address": $('#address').val(),
         "street": $('#street').val(),
     };
-    $.get('/find_sides.json', addressInputs, displaySides); 
+    $.get('/find_sides.json', addressInputs, findingSides2); 
 }
 
-$('#addres').change(streetSide);
-$('#street').change(streetSide);
+$('#addres').change(streetSide2);
+$('#street').change(streetSide2);
 
 
 function displayLocationResults(result){
     $("#address").val(result["address"]);
     $("#street").val(result["street"]);
-    findingSides(result["sides"]);
+    findingSides2(result);
 }
 
 function getCordinates(){

@@ -98,3 +98,36 @@ class CleaningWeek(db.Model):
 # def create_cleaning_weeks():
 #     """Creates entry in cleaningweeks table"""
 #     pass
+
+ # @classmethod
+    # def get_unique(cls, street_id, rt_to_address, lt_to_address, side_id):
+    #     """Checks if location already in table"""
+
+    #     # cache = db.session._unique_cache = getattr(db.session, '_unique_cache', {})
+
+    #     # key = (cls, street_id, rt_to_address, lt_to_address, side_id)
+    #     # o = cache.get(key)
+    #     # if o is None:
+    #     o = db.session.query(cls).filter(cls.street_id==street_id, 
+    #                                       cls.rt_to_address==rt_to_address, 
+    #                                       cls.lt_to_address==lt_to_address,
+    #                                       cls.side_id==side_id).first()
+    #     if o is None:
+    #         return True
+
+    # def create_user(email, password, phone=None):
+#     """Creates new user"""
+
+#     user=User(email=email, password=password, phone=phone)
+#     db.session.add(user)
+#     db.session.commit()
+
+
+# def add_number(email, phone):
+#     """updates user's phone number"""
+
+#     user = db.session.query(User).filter_by(email=email).first()
+#     user.phone=phone
+#     #should I add here?
+#     db.session.add(user)
+#     db.session.commit()

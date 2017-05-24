@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<a href='parking'><button>Park</button></a>
+
+<div id="home">
+{% if home %}
+    Home address: {{ home[0] }} {{ home[1] }}<br>
+    Next Cleaning: {{ home[2] }}<br>
+{% endif %}
+<button id="homebtn">Update Home Address</button>
+<form action='/add_fave_loc' id="homeform" class="hidden">
+    Address: <input type="text" name="address" id="homeaddress">
+    Street: <select name="street" id="homestreet" required="True">
+                <option value = ' '>  </option>
+                {% for street in streets %}
+                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                {% endfor %}
+            </select>
+    <div id="homesidediv">
+    Side of Street: <select name="side" id="homeside" required="True">
+                        <option value= " ">  </option>
+                        {% for side in sides %}
+                            <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides home'>{{ side.side_name }}</option>
+                        {% endfor %}
+                    </select>
+    </div>
+    <input type="hidden" name="type" value="hom">
+    <input type="submit" name="submit" value="Update Home Address">
+</form>
+</div>
+
+<div id="work">
+{% if work %}
+    Work address: {{ work[0] }} {{ work[1] }}<br>
+    Next Cleaning: {{ work[2] }}<br>
+{% endif %}
+<button id="workbtn">Update Work Address</button>
+<form action='/add_fave_loc' id="workform" class="hidden">
+    Address: <input type="text" name="address" id="workaddress">
+    Street: <select name="street" id="workstreet" required="True">
+                <option value = ' '>  </option>
+                {% for street in streets %}
+                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                {% endfor %}
+            </select>
+    <div id="worksidediv">
+    Side of Street: <select name="side" id="workside" required="True">
+                        <option value= " ">  </option>
+                        {% for side in sides %}
+                            <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides work'>{{ side.side_name }}</option>
+                        {% endfor %}
+                    </select>
+    </div>
+    <input type="hidden" name="type" value="wor">
+    <input type="submit" name="submit" value="Update Work Address">
+</form>
+</div>
+
+<div id="recent">
+{% if recent %}
+Last Place You Parked: {{ recent[0] }} {{ recent[1] }}<br>
+Next Cleaning: {{ recent[2] }} <br>
+{% endif %}
+<button id="recentbtn">Update Recent Address</button>
+<form action='/add_fave_loc' id="recentform" class="hidden">
+    Address: <input type="text" name="address" id="recentaddress">
+    Street: <select name="street" id="recentstreet" required="True">
+                <option value = ' '>  </option>
+                {% for street in streets %}
+                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                {% endfor %}
+            </select>
+    <div id="recentsidediv">
+    Side of Street: <select name="side" id="recentside" required="True">
+                        <option value= " ">  </option>
+                        {% for side in sides %}
+                            <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides recent'>{{ side.side_name }}</option>
+                        {% endfor %}
+                    </select>
+    </div>
+    <input type="hidden" name="type" value="las">
+    <input type="submit" name="submit" value="Update Recent Address">
+</form>
+</div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script type="text/javascript" src="/static/js/myplaces.js"></script>
+{% endblock %}
+
