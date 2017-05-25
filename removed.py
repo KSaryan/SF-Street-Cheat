@@ -131,3 +131,8 @@ class CleaningWeek(db.Model):
 #     #should I add here?
 #     db.session.add(user)
 #     db.session.commit()
+
+
+
+
+

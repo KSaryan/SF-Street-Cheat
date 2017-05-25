@@ -48,7 +48,7 @@ def job():
         db.session.delete(m)
         db.session.commit()
 
-schedule.every(1).minutes.do(job)
+schedule.every(20).minutes.do(job)
 
 while 1:
     schedule.run_pending()

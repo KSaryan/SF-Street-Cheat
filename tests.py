@@ -12,7 +12,8 @@ class MyAppUnitTestCase(TestCase):
         connect_to_db(app, "postgresql:///testdb")
         db.create_all()
         example_data()
-        now = (2017, 5, 18, 18, 3, 3, 963267)
+        self.now = datetime(2017, 5, 18, 18, 3, 3, 963267)
+        self.cleanings = Cleaning.query.filter_by(loc_id=3).all()
 
     def tearDown(self):
         """Do at end of every test."""
@@ -22,14 +23,16 @@ class MyAppUnitTestCase(TestCase):
         
 
     def test_get_sides(self):
-        self.assertEqual(helpers.get_sides_for_this_location('California', '50'), ['North'])
+        self.assertEqual(helpers.get_sides_for_this_location('California st', '50'), ['North'])
 
-    # def test_find_next_cleaning(self):
-    #     cleanings = Cleaning.query.get(1)
-    #     assert helpers.find_nect_cleaning(cleanings, now) == "blag"
+   # not done
+    def test_find_next_cleaning(self):
+        self.assertIn(helpers.find_next_cleaning(self.cleanings, self.now), "cleaning is now")
+        
+   
     def test_find_location(self):
-        self.assertEqual(str(helpers.find_location(50, 'California', 'North')), '<rt: 0-100, lt: 1-1001 for loc: 1>')
-        # assert helpers.find_location(50, 'Lake') == object
+        self.assertEqual(str(helpers.find_location(50, 'California st', 'North')), '<rt: 0-100, lt: 1-1001 for loc: 1>')
+
 
 class TestRoutesLogedIn(TestCase):
     def setUp(self):
@@ -55,11 +58,19 @@ class TestRoutesLogedIn(TestCase):
 
     def test_homepage_loged_in(self):
         result = self.client.post('/', follow_redirects=True)
-        self.assertIn("Welcome! Login to use.", result.data)
+        self.assertIn("Don't Let Street Cleaning Ruin Your Day", result.data)
+
+    def test_login_loged_in(self):
+        result = self.client.get('/login', follow_redirects=True)
+        self.assertIn("How Long Until Street Cleaning", result.data)
 
     def test_parking_loged_in(self):
         result = self.client.get('/parking')
         self.assertIn("How Long Until Street Cleaning", result.data)
+
+    def test_my_places_loged_in(self):
+        result = self.client.get('/my_places')
+        self.assertIn("Recent", result.data)
 
     def test_user_info_loged_in(self):
         result = self.client.get('/user_info')
@@ -72,6 +83,13 @@ class TestRoutesLogedIn(TestCase):
 
         self.assertIn("ksaryan3", result.data)
         self.assertIn('(818) 555 - 3333', result.data)
+
+    #failing
+    def test_add_fave_loc(self):
+        result = self.client.get('/add_fave_loc', 
+                                 query_string={'street':'California-st', 'address':'50', 'side':'North', 'typefave':'wor'}, 
+                                 follow_redirects=True)
+        self.assertIn('50 California st', result.data)
 
 
 class TestRoutesLogedOut(TestCase):
@@ -88,17 +106,18 @@ class TestRoutesLogedOut(TestCase):
         db.drop_all()
         db.session.close()
 
-    def test_homepage_loged_in(self):
-        result = self.client.get('/')
-        self.assertIn("Welcome! Login to use.", result.data)
-
-    def test_parking_loged_in(self):
+    def test_parking_loged_out(self):
         result = self.client.get('/parking', follow_redirects=True)
-        self.assertIn("Welcome! Login to use.", result.data)
+        self.assertIn("login", result.data)
 
-    def test_user_info_loged_in(self):
+    def test_my_places_loged_out(self):
+        result = self.client.get('/my_places', follow_redirects=True)
+        self.assertNotIn("Recent", result.data)
+        self.assertIn("Please login to use", result.data)
+
+    def test_user_info_loged_out(self):
         result = self.client.get('/user_info', follow_redirects=True)
-        self.assertIn("Welcome! Login to use.", result.data)
+        self.assertIn("Register", result.data)
 
     def test_user_verify(self):
         result = self.client.post('/verify_user', 
@@ -136,27 +155,27 @@ class TestRoutesWithMoc(TestCase):
 
     def test_street_cleaning(self):
         result = self.client.get('/street_cleaning.json',
-                                 query_string={'address':'50', 'street':'California', 'side':'North'})
+                                 query_string={'address':'50', 'street':'California st', 'side':'North'})
         self.assertIn('Street cleaning is today. It\'s in 1 hours.', result.data)
 
     def test_street_cleaning_tomorrow(self):
         result = self.client.get('/street_cleaning.json',
-                                 query_string={'address':'50', 'street':'Sacramento', 'side':'South'})
+                                 query_string={'address':'50', 'street':'Sacramento st', 'side':'South'})
         self.assertIn('Next cleaning is in 1 days', result.data)
     
     def test_street_cleaning_now(self):
         result = self.client.get('/street_cleaning.json',
-                                 query_string={'address':'5002', 'street':'Sacramento', 'side':'South'})
+                                 query_string={'address':'5002', 'street':'Sacramento st', 'side':'South'})
         self.assertIn('Street cleaning is now', result.data)
 
     def test_street_cleaning_wrong_address(self):
         result = self.client.get('/street_cleaning.json',
-                                 query_string={'address':'3000', 'street':'Sacramento', 'side':'South'})
+                                 query_string={'address':'3000', 'street':'Sacramento st', 'side':'South'})
         self.assertIn('Not a valid address', result.data)
 
     def test_find_sides(self):
         result = self.client.get('/find_sides.json',
-                                 query_string={'address':'50', 'street':'California' })
+                                 query_string={'address':'50', 'street':'California st' })
         self.assertIn('North', result.data)
         self.assertNotIn('South', result.data)
 

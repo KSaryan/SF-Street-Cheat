@@ -4,6 +4,7 @@ $('#locationsbtn').on('click', function(){$('#filterbtn').removeClass('hidden');
 
 
 function removeSomeMarkers(num){
+    // add all markers back first
     for(i=0; i<allMarkers.length; i++){
         text = allMarkers[i]['title']
         if (text.includes("hours")){

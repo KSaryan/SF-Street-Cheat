@@ -1,4 +1,5 @@
 var map, infoWindow;
+
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: -34.397, lng: 150.644},
@@ -14,7 +15,7 @@ function initMap() {
       };
 
       infoWindow.setPosition(pos);
-      infoWindow.setContent('Parking');
+      infoWindow.setContent("<img src=/static/img/041-car.png>")
       infoWindow.open(map);
       map.setCenter(pos);
     }, function(posError) {

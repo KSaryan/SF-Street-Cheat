@@ -47,7 +47,10 @@ def log_out():
 def log_in():
     """Displays login page"""
 
-    return render_template('login.html')
+    if 'login' in session:
+        return redirect('/parking')
+    else:
+        return render_template('login.html')
 
 
 @app.route('/verify_user', methods=["POST"])
@@ -79,7 +82,7 @@ def create_user():
     email = request.form.get("email").rstrip()
     email = email.lower()
     phone = request.form.get("phone")
-    phone = re.sub("[\-\(\)\.\s]+", "", phone)
+    phone = re.sub(r"[\-\(\)\.\s]+", "", phone)
 
     if db.session.query(User).filter(User.email==email).first():
         flash('There is already an email associated with this account. Please login.')
@@ -129,12 +132,12 @@ def update_user_info():
             password = password.rstrip()
             password = password.encode('utf8') 
             hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-            user.password = hased
+            user.password = hashed
             flash('Information Updated')
             
     
     if number:
-        number=re.sub("[\-\(\)\.\s]+", "", number)
+        number=re.sub(r"[\-\(\)\.\s]+", "", number)
         if len(number) != 10:
             flash("Invalid number. Make sure to include area code.")
         else:
@@ -294,43 +297,47 @@ def add_a_fave():
 
 @app.route('/my_places')
 def my_places():
-    home = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='hom').first()
-    if home:
-        home_location = Location.query.filter(Location.loc_id ==home.loc_id).first()
-        street = Street.query.filter(Street.street_id == home_location.street_id).first()
-        home_street = street.street_name
-        home_address = home.address
-        home_cleanings = Cleaning.query.filter(Cleaning.loc_id==home.loc_id).all()
-        home_next_cleaning = return_next_cleaning(home_cleanings)[1]
-        home = [home_address, home_street, home_next_cleaning]
-    work = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='wor').first()
-    if work:
-        work_location = Location.query.filter(Location.loc_id == work.loc_id).first()
-        street = Street.query.filter(Street.street_id == work_location.street_id).first()
-        work_street = street.street_name
-        work_address = work.address
-        work_cleanings = Cleaning.query.filter(Cleaning.loc_id==work.loc_id).all()
-        work_next_cleaning = return_next_cleaning(work_cleanings)[1]
-        work = [work_address, work_street, work_next_cleaning]
-    recent = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='las').first()
-    if recent:
-        recent_location = Location.query.filter(Location.loc_id==recent.loc_id).first()
-        street = Street.query.filter(Street.street_id == recent_location.street_id).first()
-        recent_street = street.street_name
-        recent_address = recent.address
-        recent_cleanings = Cleaning.query.filter(Cleaning.loc_id==recent.loc_id).all()
-        recent_next_cleaning = return_next_cleaning(recent_cleanings)[1]
-        recent = [recent_address, recent_street, recent_next_cleaning]
+    if 'login' in session:
+        home = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='hom').first()
+        if home:
+            home_location = Location.query.filter(Location.loc_id ==home.loc_id).first()
+            street = Street.query.filter(Street.street_id == home_location.street_id).first()
+            home_street = street.street_name
+            home_address = home.address
+            home_cleanings = Cleaning.query.filter(Cleaning.loc_id==home.loc_id).all()
+            home_next_cleaning = return_next_cleaning(home_cleanings)[1]
+            home = [home_address, home_street, home_next_cleaning]
+        work = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='wor').first()
+        if work:
+            work_location = Location.query.filter(Location.loc_id == work.loc_id).first()
+            street = Street.query.filter(Street.street_id == work_location.street_id).first()
+            work_street = street.street_name
+            work_address = work.address
+            work_cleanings = Cleaning.query.filter(Cleaning.loc_id==work.loc_id).all()
+            work_next_cleaning = return_next_cleaning(work_cleanings)[1]
+            work = [work_address, work_street, work_next_cleaning]
+        recent = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='las').first()
+        if recent:
+            recent_location = Location.query.filter(Location.loc_id==recent.loc_id).first()
+            street = Street.query.filter(Street.street_id == recent_location.street_id).first()
+            recent_street = street.street_name
+            recent_address = recent.address
+            recent_cleanings = Cleaning.query.filter(Cleaning.loc_id==recent.loc_id).all()
+            recent_next_cleaning = return_next_cleaning(recent_cleanings)[1]
+            recent = [recent_address, recent_street, recent_next_cleaning]
 
-    streets = Street.query.order_by(Street.street_name.asc()).all()
-    sides = Side.query.all()
+        streets = Street.query.order_by(Street.street_name.asc()).all()
+        sides = Side.query.all()
 
-    return render_template('/myplaces.html', 
-                           recent=recent, 
-                           work=work, 
-                           home=home, 
-                           streets=streets, 
-                           sides=sides)
+        return render_template('/myplaces.html', 
+                               recent=recent, 
+                               work=work, 
+                               home=home, 
+                               streets=streets, 
+                               sides=sides)
+    else:
+        flash("Please login to use")
+        return redirect('/login')
 
   
 if __name__ == "__main__":

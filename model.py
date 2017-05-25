@@ -189,8 +189,8 @@ class MessageToSend(db.Model):
 def example_data():
     user = User(email = "kristine", password = "boo")
     user2 = User(email = "kristine", password = "boo", phone='8183333333')
-    street = Street(street_id = 1, street_name = "California")
-    street2 = Street(street_id = 2, street_name = "Sacramento")
+    street = Street(street_id = 1, street_name = "California st")
+    street2 = Street(street_id = 2, street_name = "Sacramento st")
     street3 = Street(street_id = 3, street_name = "Lake")
     side = Side(side_id = 1, side_name = "North")
     side2 = Side(side_id = 2, side_name = "South")
@@ -236,13 +236,22 @@ def example_data():
                         end_time = '20:00',
                         week_of_mon = 3,
                         day_id = 'Thu')
+    cleaning4 = Cleaning(loc_id = 3,
+                        start_time = '8:00',
+                        end_time = '20:00',
+                        week_of_mon = 3,
+                        day_id = 'Fri')
 
     day = Day(day_id = 'Thu', day_name = 'Thursday')
     day2 = Day(day_id = 'Fri', day_name ='Friday')
+    type1 = Type(type_id="hom", type_name="home")
+    type2 = Type(type_id="wor", type_name="work")
+    type3 = Type(type_id="las", type_name="last")
     db.session.add_all([day, day2, cleaning, cleaning2, 
                         location, location2, side, street, 
                         user, street2, side2, location3,
-                        cleaning3, user2, street3, location4])
+                        cleaning3, user2, street3, location4,
+                        type2, type3, type1, cleaning4])
     db.session.commit()
 
 def connect_to_db(app, db_uri = "postgres:///parking"):
