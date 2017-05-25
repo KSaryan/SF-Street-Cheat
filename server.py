@@ -182,21 +182,27 @@ def street_cleaning():
         if 'login' in session:
             add_fave_location(session['login'], location.loc_id, 'las', address)
 
+
         street_cleanings = Cleaning.query.filter(Cleaning.loc_id==location.loc_id).all()
+
+        holiday = check_for_holidays(street_cleanings)
+
+        if holiday is None:
+            holiday = ""
 
         next_cleaning = return_next_cleaning(street_cleanings)
         if next_cleaning[0] == "now":
             result = {"info_message": next_cleaning[0], 
-                      "message": next_cleaning[1],
+                      "message": next_cleaning[1] + "/n" + holiday,
                       "geolocation": geolocation}
 
         else:
             result = {"info_message": next_cleaning[0], 
-                      "message": next_cleaning[1],
+                      "message": next_cleaning[1] + "\n" + holiday,
                       "cleaning_time":next_cleaning[2],
                       "geolocation": geolocation}
     else:
-        message = "Not a valid address"
+        message = "Not a valid address or no street cleaning in area (Russian Hill)"
         result = {"info_messge": "not a valid address",
                   "message": message,
                   "geolocation": geolocation}
@@ -235,9 +241,12 @@ def find_sides():
     street = request.args.get("street")
     street = street.replace("-", " ")
     sides = get_sides_for_this_location(street, address)
-    sides_json = {'sides': sides
-                 }
-    return jsonify(sides_json)
+    if sides:
+        sides_json = {'sides': sides
+                     }
+        return jsonify(sides_json)
+    else:
+        return "no sides"
 
 
 @app.route('/send_text.json', methods=["POST"])

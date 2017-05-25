@@ -12,6 +12,12 @@ def get_datetime():
   pacific = pytz.timezone('US/Pacific')
   return datetime.now(tz=pacific)
 
+def check_for_holidays(street_cleanings):
+  for cleaning in street_cleanings:
+    if cleaning.day_id == 'Hol':
+      return "There are holiday hours associated with this location. They are %s - %s (military time.)" %(cleaning.start_time, cleaning.end_time)
+
+  return None
 
 def find_next_cleaning(street_cleanings, now):
   """Finds a cleaning on an upcoming day"""
@@ -88,6 +94,7 @@ def get_sides_for_this_location(street, address):
                                           Location.lt_to_address >= address).all()
     sides = []
     for location in locations:
+      if location.sides:
         sides.append(location.sides.side_name)
     return sides
 

@@ -36,12 +36,14 @@ $('#addressbtn').on('click', submitAddress)
 
 
 function findingSides2(result){
-    var listOfSides = result["sides"];
     $('#sidediv').fadeOut();
     $('.sides').addClass('hidden');
-    for (var i=0; i< listOfSides.length; i++){
-        var sideId = '#' + listOfSides[i];
-        $(sideId).removeClass('hidden'); 
+    if (result != "no sides"){
+        var listOfSides = result["sides"];
+        for (var i=0; i< listOfSides.length; i++){
+            var sideId = '#' + listOfSides[i];
+            $(sideId).removeClass('hidden'); 
+        }
     }
     $('#sidediv').fadeIn();
 }
