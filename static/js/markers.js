@@ -9,7 +9,7 @@ function removeMarkers(){
 }
 
 function showLocations(result){
-  removeMarkers()
+  removeMarkers();
   for (key in result){
       var text = result[key]['message']
       var myLatLng = {lat: result[key]['coordinates'][1], lng: result[key]['coordinates'][0]};
@@ -36,6 +36,8 @@ function showLocations(result){
       var infowindow = new google.maps.InfoWindow({
           content: text.toString()
       });
+
+      $('#placescol').prepend('<button>' + text.toString() + "</button>")
 
       google.maps.event.addListener(marker,'click', (function(marker,text,infowindow){ 
         return function() {

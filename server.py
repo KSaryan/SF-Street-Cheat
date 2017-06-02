@@ -5,7 +5,8 @@ from flask import (Flask, render_template, redirect, request, flash,
 # from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import update
 from model import (Location, Cleaning, Day, User, Side, 
-                   Street, FaveLocation, MessageToSend, connect_to_db, db)
+                   Street, FaveLocation, MessageToSend, 
+                   Towing, Tow_Location, Tow_Side, connect_to_db, db)
 import json
 # from datetime import datetime, timedelta, date
 import bcrypt
@@ -27,13 +28,14 @@ app.secret_key = "ABC"
 @app.route('/')
 def homepage():
     """Displays homepage with login form"""
+    
     if 'login' in session:
         return redirect ('/parking')
     else:
         return render_template('homepage.html')
 
 
-@app.route('/', methods=["POST"])
+@app.route('/logout')
 def log_out():
     """logs out user"""
 
@@ -82,7 +84,8 @@ def create_user():
     email = request.form.get("email").rstrip()
     email = email.lower()
     phone = request.form.get("phone")
-    phone = re.sub(r"[\-\(\)\.\s]+", "", phone)
+    if phone:
+        phone = re.sub(r"[\-\(\)\.\s]+", "", phone)
 
     if db.session.query(User).filter(User.email==email).first():
         flash('There is already an email associated with this account. Please login.')
@@ -91,16 +94,17 @@ def create_user():
         if len(email) > 30:
             flash('Password or email too long')
             return redirect('/login')
-        if len(phone) != 10:
-            flash("Invalid number. Make sure to include area code.")
-            return redirect('/login')
-        else:    
-            user = User(password=hashed, email=email, phone=phone)
-            db.session.add(user)
-            db.session.commit()
-            session['login']= user.user_id
-            flash('Thank you for creating an account')
-            return redirect('/parking')
+        if phone:
+            if len(phone) != 10:
+                flash("Invalid number. Make sure to include area code.")
+                return redirect('/login')
+
+    user = User(password=hashed, email=email, phone=phone)
+    db.session.add(user)
+    db.session.commit()
+    session['login']= user.user_id
+    flash('Thank you for creating an account')
+    return redirect('/parking')
 
 
 @app.route('/user_info')
@@ -174,6 +178,11 @@ def street_cleaning():
     street = (request.args.get("street")).replace("-", " ")
     side = request.args.get("side")
     geolocation = find_geolocation(address, street)
+
+    towing_locs = get_towing_locs(address, street)
+    towings = get_towings(towing_locs)
+    towing_message = get_towing_message(towings)
+
     if side == " " or side == None:
         location = find_location(address, street)
     else:
@@ -194,13 +203,15 @@ def street_cleaning():
         if next_cleaning[0] == "now":
             result = {"info_message": next_cleaning[0], 
                       "message": next_cleaning[1] + "/n" + holiday,
-                      "geolocation": geolocation}
+                      "geolocation": geolocation,
+                      "towing": towing_mesage}
 
         else:
             result = {"info_message": next_cleaning[0], 
                       "message": next_cleaning[1] + "\n" + holiday,
                       "cleaning_time":next_cleaning[2],
-                      "geolocation": geolocation}
+                      "geolocation": geolocation,
+                      "towing": towing_message}
     else:
         message = "Not a valid address or no street cleaning in area (Russian Hill)"
         result = {"info_messge": "not a valid address",
@@ -286,9 +297,10 @@ def find_nearby_cleanings():
     results = {}
     for i in range (len(closest_places)):
         item = closest_places[i]
-        message = "Try parking on %s. %s." %(item[3], item[2])
+        message = "Try parking on %s. %s" %(item[3], item[2])
         results[str(i)] = {"km": item[0], "coordinates": item[1], "message": message }
     return jsonify(results)
+
 
 @app.route('/add_fave_loc')
 def add_a_fave():
@@ -348,9 +360,32 @@ def my_places():
         flash("Please login to use")
         return redirect('/login')
 
+
+@app.route('/heatmap')
+def show_heat_map():
+    return render_template('map.html')
+
+@app.route('/get_all_locations.json')
+def get_all_locations():
+    print "1"
+    all_cleanings = Cleaning.query.all()
+    geos = []
+    for cleaning in all_cleanings:
+        print '2'
+        locations = Location.query.filter(Location.loc_id == cleaning.loc_id).all()
+        for location in locations:
+            print '3'
+            for geo in location.lng_lat:
+                print '4'
+                geos.append([float(geo[0]), float(geo[1])])
+    all_cleanings = {'all_geos': geos}
+    return jsonify(all_cleanings)
+
+
   
 if __name__ == "__main__":
 
+    app.debug = True
     connect_to_db(app)
 
 

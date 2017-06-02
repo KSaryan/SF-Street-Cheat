@@ -1,7 +1,8 @@
 $('#gettext').toggle();
 $('#locationsbtn').toggle();
 $('#logintextbtn').toggle();
-
+$('#timepanel').toggle();
+$('#towingpanel').toggle();
 
 
 function displayStreetCleaningResults(result){
@@ -15,6 +16,12 @@ function displayStreetCleaningResults(result){
     }
         
     $('#timeleft').html(result["message"]);
+    $('#towingdiv').html(result["towing"]);
+    $('#timeleft').prepend('<img id="carImg" src="/static/img/041-car.png" />')
+    $('#towingdiv').prepend('<img id="towImg" src="/static/img/tow.png" />')
+    $('#timepanel').fadeIn();
+    $('#towingpanel').fadeIn();
+    $('#towImg')[0].style.width = '60px';
     var latlng = {'lat': result['geolocation']['lat'], 
                   'lng': result['geolocation']['lng']}
     map.setCenter(latlng);
@@ -36,7 +43,7 @@ $('#addressbtn').on('click', submitAddress)
 
 
 function findingSides2(result){
-    $('#sidediv').fadeOut();
+    // $('#sidediv').fadeOut();
     $('.sides').addClass('hidden');
     if (result != "no sides"){
         var listOfSides = result["sides"];
@@ -45,7 +52,7 @@ function findingSides2(result){
             $(sideId).removeClass('hidden'); 
         }
     }
-    $('#sidediv').fadeIn();
+    // $('#sidediv').fadeIn();
 }
 
         

@@ -2,88 +2,130 @@
 
 
 {% block content %}
-<a href='parking'><button>Park</button></a>
-
-<div id="home">
-{% if home %}
-    Home address: {{ home[0] }} {{ home[1] }}<br>
-    Next Cleaning: {{ home[2] }}<br>
-{% endif %}
-<button id="homebtn">Update Home Address</button>
-<form action='/add_fave_loc' id="homeform" class="hidden">
-    Address: <input type="text" name="address" id="homeaddress">
-    Street: <select name="street" id="homestreet" required="True">
-                <option value = ' '>  </option>
-                {% for street in streets %}
-                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
-                {% endfor %}
-            </select>
-    <div id="homesidediv">
-    Side of Street: <select name="side" id="homeside" required="True">
-                        <option value= " ">  </option>
-                        {% for side in sides %}
-                            <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides home'>{{ side.side_name }}</option>
-                        {% endfor %}
-                    </select>
+<nav class="navbar navbar-dark" style="background-color: DarkSlateGray;">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand brand" href="/">SF StreetCheat</a>
     </div>
-    <input type="hidden" name="type" value="hom">
-    <input type="submit" name="submit" value="Update Home Address">
-</form>
-</div>
 
-<div id="work">
-{% if work %}
-    Work address: {{ work[0] }} {{ work[1] }}<br>
-    Next Cleaning: {{ work[2] }}<br>
-{% endif %}
-<button id="workbtn">Update Work Address</button>
-<form action='/add_fave_loc' id="workform" class="hidden">
-    Address: <input type="text" name="address" id="workaddress">
-    Street: <select name="street" id="workstreet" required="True">
-                <option value = ' '>  </option>
-                {% for street in streets %}
-                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
-                {% endfor %}
-            </select>
-    <div id="worksidediv">
-    Side of Street: <select name="side" id="workside" required="True">
-                        <option value= " ">  </option>
-                        {% for side in sides %}
-                            <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides work'>{{ side.side_name }}</option>
-                        {% endfor %}
-                    </select>
-    </div>
-    <input type="hidden" name="type" value="wor">
-    <input type="submit" name="submit" value="Update Work Address">
-</form>
-</div>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/parking" style="color: white;"> Park</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
 
-<div id="recent">
-{% if recent %}
-Last Place You Parked: {{ recent[0] }} {{ recent[1] }}<br>
-Next Cleaning: {{ recent[2] }} <br>
-{% endif %}
-<button id="recentbtn">Update Recent Address</button>
-<form action='/add_fave_loc' id="recentform" class="hidden">
-    Address: <input type="text" name="address" id="recentaddress">
-    Street: <select name="street" id="recentstreet" required="True">
-                <option value = ' '>  </option>
-                {% for street in streets %}
-                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
-                {% endfor %}
-            </select>
-    <div id="recentsidediv">
-    Side of Street: <select name="side" id="recentside" required="True">
-                        <option value= " ">  </option>
-                        {% for side in sides %}
-                            <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides recent'>{{ side.side_name }}</option>
-                        {% endfor %}
+
+
+<div class="container">
+    <div class="row">
+        <div id= "home" class="col-xs-4">
+            {% if home %}
+                <div class="panel panel-success" id="homepanel" style="vertical-align: middle;">
+                    <div class="panel-heading">Home Address</div>
+                    <div id="homediv" class="panel-body">{{ home[0] }} {{ home[1] }}<br>
+                    <b>Next Cleaning: </b>{{ home[2] }}</div>
+                </div>
+            {% endif %}
+            <button class="btn btn-default" id="homebtn">Update Home Address</button>
+            <form action='/add_fave_loc' id="homeform" class="hidden">
+                Address: <input type="text" name="address" id="homeaddress">
+                Street: <select name="street" id="homestreet" required="True">
+                            <option value = ' '>  </option>
+                            {% for street in streets %}
+                                <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                            {% endfor %}
+                        </select>
+                <div id="homesidediv">
+                Side of Street: <select name="side" id="homeside" required="True">
+                                    <option value= " ">  </option>
+                                    {% for side in sides %}
+                                        <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides home'>{{ side.side_name }}</option>
+                                    {% endfor %}
                     </select>
+                    </div>
+                <input type="hidden" name="type" value="hom">
+                <input type="submit" name="submit" value="Update Home Address">
+            </form>
+        </div>
+        <div id= "work" class="col-xs-4">
+            {% if work %}
+                <div class="panel panel-success" id="workpanel" style="vertical-align: middle;">
+                    <div class="panel-heading">Work Address</div>
+                    <div id="workdiv" class="panel-body"><h4>{{ work[0] }} {{ work[1] }}<br><br>
+                <b>Next Cleaning: </b>{{ work[2] }}</h4></div>
+                </div>
+            {% endif %}
+            <button class="btn btn-default" id="workbtn">Update Work Address</button>
+            <form action='/add_fave_loc' id="workform" class="hidden">
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input name="address" type="text" class="form-control" id="workaddress" placeholder="Address" required="True">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Street</label>
+                    <div class="controls">
+                        <select name="street" id="workstreet" class="form-control input-xlarge" required="True">
+                            <option value="" selected="selected">(please select)</option>
+                            {% for street in streets %}
+                                <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div id="worksidediv" class="form-group">
+                    <label class="form-label">Street Side</label>
+                    <div class="controls">
+                        <select name="side" id="workside" class="form-control input-xlarge" required="True">
+                            <option value="" selected="selected">(please select)</option>
+                            {% for side in sides %}
+                                <option value={{ side.side_name }} id = {{ side.side_name }} class = 'hidden sides work'>{{ side.side_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" name="type" value="wor">
+                <button type="submit" class="btn btn-default" >Update Work Address</button>
+            </form>
+        </div>
+        <div id="recent" class="col-xs-4">
+            {% if recent %}
+                <div class="panel panel-success" id="recentpanel" style="vertical-align: middle;">
+                    <div class="panel-heading">Last Place You Parked</div>
+                    <div id="recentdiv" class="panel-body">{{ recent[0] }} {{ recent[1] }}<br><b>Next Cleaning:</b> {{ recent[2] }}</div>
+                </div>
+            {% endif %}
+            <button class="btn btn-default" id="recentbtn">Update Recent Address</button>
+            <form action='/add_fave_loc' id="recentform" class="hidden">
+                Address: <input type="text" name="address" id="recentaddress">
+                Street: <select name="street" id="recentstreet" required="True">
+                            <option value = ' '>  </option>
+                            {% for street in streets %}
+                                <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                            {% endfor %}
+                        </select>
+                <div id="recentsidediv">
+                Side of Street: <select name="side" id="recentside" required="True">
+                                    <option value= " ">  </option>
+                                    {% for side in sides %}
+                                        <option value={{ side.side_name }} id = {{ side.side_name }}  class = 'hidden sides recent'>{{ side.side_name }}</option>
+                                    {% endfor %}
+                                </select>
+                </div>
+                <input type="hidden" name="type" value="las">
+                <input type="submit" name="submit" value="Update Recent Address">
+            </form>
+        </div>
     </div>
-    <input type="hidden" name="type" value="las">
-    <input type="submit" name="submit" value="Update Recent Address">
-</form>
-</div>
+  </div>
+
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
 <script type="text/javascript" src="/static/js/myplaces.js"></script>

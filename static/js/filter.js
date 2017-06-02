@@ -1,5 +1,5 @@
 
-$('#filterbtn').on('click', function(){$('#filterform').removeClass('hidden');});
+$('#filterbtn').on('click', function(){$('#filterform').removeClass('hidden'); $('#filterbtn').hide();});
 $('#locationsbtn').on('click', function(){$('#filterbtn').removeClass('hidden');})
 
 
@@ -12,10 +12,10 @@ function removeSomeMarkers(num){
             if (text.includes(" 0 ") || text.includes(" 1 ")){
             var category = 1;
             }
-        }else if (text.includes("days")){
-            if (text.includes(" 0 ")) {
+        }else if (text.includes("tomorrow")) {
                 var category = 2;
-            }else if (text.includes(" 1 ")){
+        }else if (text.includes("days")){
+            if (text.includes(" 1 ")){
                 var category = 3;
             }else if  (text.includes(" 2 ") || text.includes(" 3 ") || text.includes(" 4 ") || text.includes(" 5 ") || text.includes(" 6 ")){
                 var category = 4;

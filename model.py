@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta, date
 import pytz
+import bcrypt
 # from server import app
 
 db = SQLAlchemy()
@@ -107,6 +108,7 @@ class Day (db.Model):
 
     day_id = db.Column(db.String(4), primary_key=True)
     day_name = db.Column(db.String(9), nullable=False)
+    day_short = db.Column(db.String(2), nullable=False)
 
     def __repr__ (self):
         """Displayed when called"""
@@ -186,9 +188,68 @@ class MessageToSend(db.Model):
                                                   self.user_id, 
                                                   self.time)
 
+class Tow_Location(db.Model):
+    """Unique tow locations"""
+
+    __tablename__ = "tow_locations"
+
+    tow_loc_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    street_id = db.Column(db.Integer, db.ForeignKey('streets.street_id'))
+    rt_from_address = db.Column(db.Integer, nullable=False)
+    rt_to_address = db.Column(db.Integer, nullable=False)
+    lt_from_address = db.Column(db.Integer, nullable=False)
+    lt_to_address = db.Column(db.Integer, nullable=False)
+    tow_side_id = db.Column(db.Integer, db.ForeignKey('tow_sides.tow_side_id'))
+    
+    tow_sides = db.relationship('Tow_Side', backref='tow_locations')
+    streets = db.relationship('Street', backref='tow_locations')
+
+    def __repr__ (self):
+        """Displayed when called"""
+
+        return "<rt: %s-%s, lt: %s-%s for loc: %s>"%(self.rt_from_address,
+                                                        self.rt_to_address,
+                                                        self.lt_from_address,
+                                                        self.lt_to_address,
+                                                        self.tow_loc_id)
+class Towing(db.Model):
+    """Individdual towings"""
+
+    __tablename__ = "towings"
+
+    towing_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    tow_loc_id = db.Column(db.Integer, db.ForeignKey('tow_locations.tow_loc_id'))
+    start_time = db.Column(db.String(20), nullable=False)
+    day_id = db.Column(db.String(4), db.ForeignKey('days.day_id'))
+
+    tow_locations = db.relationship('Tow_Location', backref='towings')
+    days = db.relationship('Day', backref='towings')
+
+    def __repr__ (self):
+        """Displayed when called"""
+
+        return "< towing for loc-id: %s>"%(self.tow_loc_id)
+
+class Tow_Side(db.Model):
+    """sides for towing"""
+
+    __tablename__ = "tow_sides"
+
+    tow_side_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    tow_side_name = db.Column(db.String(5), nullable=False)
+
+    def __repr__ (self):
+        """Displayed when called"""
+
+        return "<%s>"%(self.tow_side_name)
+
+
 def example_data():
-    user = User(email = "kristine", password = "boo")
-    user2 = User(email = "kristine", password = "boo", phone='8183333333')
+    password = "boo"
+    password = password.encode('utf8') 
+    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+    user = User(email = "kristine", password = hashed)
+    user2 = User(email = "kristine", password = hashed, phone='8183333333')
     street = Street(street_id = 1, street_name = "California st")
     street2 = Street(street_id = 2, street_name = "Sacramento st")
     street3 = Street(street_id = 3, street_name = "Lake")
@@ -241,9 +302,15 @@ def example_data():
                         end_time = '20:00',
                         week_of_mon = 3,
                         day_id = 'Fri')
+    cleaning5 = Cleaning(loc_id = 2,
+                        start_time = '8:00',
+                        end_time = '13:00',
+                        week_of_mon = 3,
+                        day_id = 'Mon')
 
     day = Day(day_id = 'Thu', day_name = 'Thursday')
     day2 = Day(day_id = 'Fri', day_name ='Friday')
+    day3 = Day(day_id = 'Mon', day_name ='Monday')
     type1 = Type(type_id="hom", type_name="home")
     type2 = Type(type_id="wor", type_name="work")
     type3 = Type(type_id="las", type_name="last")
@@ -251,7 +318,7 @@ def example_data():
                         location, location2, side, street, 
                         user, street2, side2, location3,
                         cleaning3, user2, street3, location4,
-                        type2, type3, type1, cleaning4])
+                        type2, type3, type1, cleaning4, cleaning5, day3])
     db.session.commit()
 
 def connect_to_db(app, db_uri = "postgres:///parking"):

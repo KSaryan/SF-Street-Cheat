@@ -1,5 +1,6 @@
 from model import (Location, Cleaning, Day, User, Side, 
-                   Street, FaveLocation, MessageToSend, connect_to_db, db)
+                   Street, FaveLocation, MessageToSend, 
+                   Towing, Tow_Location, Tow_Side, connect_to_db, db)
 from datetime import datetime, timedelta
 import pytz
 import requests
@@ -12,12 +13,69 @@ def get_datetime():
   pacific = pytz.timezone('US/Pacific')
   return datetime.now(tz=pacific)
 
+
 def check_for_holidays(street_cleanings):
   for cleaning in street_cleanings:
     if cleaning.day_id == 'Hol':
       return "There are holiday hours associated with this location. They are %s - %s (military time.)" %(cleaning.start_time, cleaning.end_time)
 
   return None
+
+
+def get_towing_locs(address, street):
+  """finds towing_locations for address"""
+
+  street1 = Street.query.filter(Street.street_name == street).first()
+  tow_locs = Tow_Location.query.filter()
+  address = int(address)
+  if address % 2 == 0:
+      locations = Tow_Location.query.filter(Tow_Location.street_id==street1.street_id,
+                                        Tow_Location.rt_from_address <= address, 
+                                        Tow_Location.rt_to_address >= address).all()
+  else: 
+      locations = Tow_Location.query.filter(Tow_Location.street_id==street1.street_id,
+                                        Tow_Location.lt_from_address <= address, 
+                                        Tow_Location.lt_to_address >= address).all()
+
+  return locations
+
+
+def get_towings(towing_locs):
+  """finds next two towing times"""
+
+  now = get_datetime()
+  day = now.strftime("%a")
+  tomorrow = now + timedelta(days=1)
+  tomorrow_day = tomorrow.strftime("%a")
+
+  towings_list = []
+  for loc in towing_locs:
+    loc_id = loc.tow_loc_id
+    towings = Towing.query.filter(Towing.tow_loc_id==loc_id).all()
+    towings_list.extend(towings)
+  # print towings_list
+  next_towings = []
+  for towing in towings_list:
+    if towing.day_id == day or towing.day_id == tomorrow_day:
+      next_towings.append(towing)
+  return next_towings [:2]
+
+
+def get_towing_message(towings):
+  """creates message about towing"""
+
+  t_mesages = []
+  if towings:
+      for t in towings:
+          t_side = t.tow_locations.tow_sides.tow_side_name
+          t_side = (t_side.rstrip(" Sides")).lower()
+          t_message = "There is towing on the %s side(s) of this street on %s, at %s."%(t_side, t.days.day_name, t.start_time)
+          t_mesages.append(t_message)
+  towing_message = ""
+  for message in t_mesages:
+      towing_message += message
+  return towing_message
+
 
 def find_next_cleaning(street_cleanings, now):
   """Finds a cleaning on an upcoming day"""
@@ -40,6 +98,7 @@ def find_next_cleaning(street_cleanings, now):
                                                                                                          date, 
                                                                                                          cleaning.start_time, 
                                                                                                          cleaning.end_time)
+                message = message.replace("in 0 days", "tomorrow")
                 today = get_datetime()
                 year = str(today.year)
                 cleaning_time_string = month + "-" + date + "-" + year +" " + cleaning.start_time

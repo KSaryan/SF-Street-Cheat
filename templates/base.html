@@ -3,35 +3,11 @@
 <head>
   <title>SF Street Cheat</title>
 
-  <style>
-    #map {
-      float: right;
-      height: 20em;
-      width: 25em
-    }
-    h1{
-      color: green;
-    }
-    .hidden{
-      display: none;
-    }
-    #forms {
-      width: 30em;
-      float: left;
-    }
-    #homediv{
-      width: 25em;
-      float: left;
-    }
-    #workdiv{
-      width: 25em;
-      float: right;
-    }
-    #recentdiv{
-      width: 25em;
-      float: right;
-    }
-  </style>
+ 
+  <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
+
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -45,12 +21,13 @@
 
 </head>
 
-<body>
+<body class="container-fluid col-xs-12">
   
-  <h1>SF Street Cheat</h1>
+  <!-- <h1>SF Street Cheat</h1> -->
 
   {% block content %} put your content here {% endblock %}
-  
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 
 </html>

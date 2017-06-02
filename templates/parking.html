@@ -1,83 +1,139 @@
 {% extends 'base.html' %}
-
 {% block content %}
-{% if email %}
-    Welcome <a href='/user_info'><button>{{ email }}</button></a>
-    <a href='/my_places'><button>My Places</button></a>
-    <form action='/' method="POST">
-        <input type='submit' value='logout'>
-    </form>
-{% else %}
-    <a href='/login'><button>Login</button></a>
-{% endif %}
+<nav class="navbar navbar-dark" style="background-color: DarkSlateGray;"> 
+    <div class="container">
+      <a class="brand navbar-brand" href="/">SF Street Cheat</a>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            {% if email %}
+                <div class="nav-item dropdown navbar-right">
+                    <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                      Welcome {{ email }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <ul>
+                        <li>
+                          <a class="dropdown-item" href="/my_places">My Places</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="/logout">Log Out</a>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+       
+            {% else %}
+                <div class="nav-item active navbar-right">
+                    <a class="nav-link" href="/login" style="color: white;">Log In<span class="sr-only">(current)</span></a>
+                </div>
+            {% endif %}     
+          
+      </div>
+    </div>
+</nav>
 
-<div id='forms'>
-    <h1>How Long Until Street Cleaning</h1>
-    <p>
-        <form id="adressinfo">
-            Number: <input type="text" name="address" id="address" required="True"><br>
-            
-            Street: <select name="street" id="street" required="True">
-                <option value = ' '>  </option>
-                {% for street in streets %}
-                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
-                {% endfor %}
-            </select>
-            <br>
-            <br>
-            <br>
-            <div id="sidediv">
-            Please Choose Side of Street: <select name="side" id="side" required="True">
-                <option value= " ">  </option>
-                {% for side in sides %}
-                    <option value={{ side.side_name }} id = {{ side.side_name }} class = 'hidden sides'>{{ side.side_name }}</option>
-                {% endfor %}
-            </select>
-            </div>
-            <br>
-
-            <button id="addressbtn">When is Street Cleaning?</button>
-        </form>
-    </p>
-
-
-    <div id="timeleft"></div>
-
-    {% if 'login' in session %}
-        <form id="gettext">
-            <input name="cleaningtime" id="cleaningtime" type="hidden">
-            <input type="submit" name="submit" value="Get A Text Reminder">
-        </form>
-    {% else %}
-        <a href='/login' id="logintextbtn"><button>Login to Get Text Reminders</button></a>
-    {% endif %}
-    <button id="locationsbtn">Parking in my Neighborhood</button>
+<div id="parkingpage" class="container">
+    <div class="row">
+        <div id="placescol" class="col-xs-1">
+        </div>
+        <div id= "mapcol" class="col-xs-7">
+            <div id= "map"> </div>
+                <div class="row">
     
-    <button id="filterbtn" class="hidden">Filter</button>
-    <form name="filterform" id="filterform" class="hidden">
-        I'm parking for: <select name="filteroptions" id="filteroptions" required="True">
-                            <option value = '1'>two hours</option>
-                            <option value = '2'>until tomorrow</option>
-                            <option value = '3'>two days</option>
-                            <option value = '4'>a week</option>
+                    <div id= "textbtns" class="col-xs-5">
+                        {% if 'login' in session %}
+                            <form id="gettext">
+                                <input name="cleaningtime" id="cleaningtime" type="hidden">
+                                <input type="submit" name="submit" class="btn btn-default" value="Get A Text Reminder">
+                            </form>
+                        {% else %}
+                            <a href='/login' id="logintextbtn"><button class="btn btn-default">Login to Get Text Reminders</button></a>
+                        {% endif %}
+                    </div>
+                    
+                    <div id="makrkerbtns" class="col-xs-4">
+                        <button id="locationsbtn" class="btn btn-default">Parking in my Neighborhood</button>
+                     </div>
+
+                    <div id="filterbtndiv" class="col-xs-3">
+                        <button id="filterbtn" class="hidden btn btn-default">Filter Results</button>
+
+                        <form name="filterform" id="filterform" class="hidden" role="form">
+                            <div class="form-group">
+                                <label class="form-label">I'm Parking For:</label>
+                                <div class="controls">
+                                    <select name="filteroptions" id="filteroptions" class="form-control input-xlarge" required="True">
+                                        <option value="" selected="selected">(please select)</option>
+                                        <option value = '1'>two hours</option>
+                                        <option value = '2'>until tomorrow</option>
+                                        <option value = '3'>two days</option>
+                                        <option value = '4'>a week</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <input type="submit" name="submit" class="btn btn-default" value="Filter">
+                        </form>
+                    </div>
+                </div>
+        </div>
+        <div id= "scform" class="col-xs-4">
+          <h1>How Long Until Street Cleaning</h1>
+            <form id="adressinfo" role="form">
+                <div id="section1">
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input name="address" type="text" class="form-control" id="address" placeholder="Address" required="True">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Street</label>
+                        <div class="controls">
+                            <select name="street" id="street" class="form-control input-xlarge" required="True">
+                                <option value="" selected="selected">(please select)</option>
+                                {% for street in streets %}
+                                    <option value= {{ street.street_name|replace(" ", "-") }}>{{ street.street_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <button id="usethisaddress"> Use This Address </button>
+                </div>
+                
+                <div id="sidediv" class="form-group">
+                    <label class="form-label">Street Side</label>
+                    <div class="controls">
+                        <select name="side" id="side" class="form-control input-xlarge" required="True">
+                            <option value="" selected="selected">(please select)</option>
+                            {% for side in sides %}
+                                <option value={{ side.side_name }} id = {{ side.side_name }} class = 'hidden sides'>{{ side.side_name }}</option>
+                            {% endfor %}
                         </select>
-        <input type="submit" name="submit">
-    </form>
+                    </div>
+                <button type="submit" class="btn btn-default" id="addressbtn">When is Street Cleaning?</button>
+                </form>
+                </div>
 
+            <div class="panel panel-success" id="timepanel" style="vertical-align: middle;">
+                <div class="panel-heading">Time to Street Cleaning</div>
+                <div id="timeleft" class="panel-body"></div>
+            </div>
+            <div class="panel panel-success" id="towingpanel" style="vertical-align: middle;">
+                <div class="panel-heading">Towing Information</div>
+                <div id="towingdiv" class="panel-body"></div>
+            </div>
+        </div>
+        
 
+    </div>
 </div>
-
-<div id='map'></div>
-
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
 <script type="text/javascript" src="/static/js/showstreetcleaninginfo.js"></script>
-<!-- <script type="text/javascript" src="/static/js/coordinates.js"></script> -->
 <script type="text/javascript" src="/static/js/map.js"></script>
 <script async defer
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ&callback=initMap"></script>
 <script type="text/javascript" src="/static/js/sendtext.js"></script>
 <script type="text/javascript" src='/static/js/markers.js'></script>
 <script type="text/javascript" src='/static/js/filter.js'></script>
+<script type="text/javascript" src='/static/js/parking.js'></script>
 {% endblock %}
+
 
