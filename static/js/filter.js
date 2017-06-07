@@ -5,6 +5,7 @@ $('#locationsbtn').on('click', function(){$('#filterbtn').removeClass('hidden');
 
 function removeSomeMarkers(num){
     for(i=0; i<allMarkers.length; i++){
+        $('#' + (i).toString()).show()
         allMarkers[i].setMap(map);
         text = allMarkers[i]['title'];
         if (text.includes("hours")){
@@ -24,11 +25,11 @@ function removeSomeMarkers(num){
         allMarkers[i]['category'] = category
     }
     for(i=1; i<=num; i++){
-        console.log(i);
         for(j=0; j<allMarkers.length; j++){
-            console.log(allMarkers[j]['category']);
             if (parseInt(allMarkers[j]['category']) == i){
                 allMarkers[j].setMap(null);
+                var id = allMarkers[j].num;
+                $('#' + (id).toString()).hide();
         }
         }
     }

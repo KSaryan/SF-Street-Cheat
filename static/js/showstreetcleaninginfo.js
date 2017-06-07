@@ -1,8 +1,8 @@
 $('#gettext').toggle();
 $('#locationsbtn').toggle();
 $('#logintextbtn').toggle();
-$('#timepanel').toggle();
-$('#towingpanel').toggle();
+// $('#timepanel').toggle();
+// $('#towingpanel').toggle();
 
 
 function displayStreetCleaningResults(result){
@@ -14,18 +14,19 @@ function displayStreetCleaningResults(result){
         $('#locationsbtn').fadeIn();
         $('#logintextbtn').fadeIn();
     }
-        
-    $('#timeleft').html(result["message"]);
-    $('#towingdiv').html(result["towing"]);
-    $('#timeleft').prepend('<img id="carImg" src="/static/img/041-car.png" />')
-    $('#towingdiv').prepend('<img id="towImg" src="/static/img/tow.png" />')
-    $('#timepanel').fadeIn();
-    $('#towingpanel').fadeIn();
+    if ((result["towing"]).length < 1){
+        var towmsg = "No towing coming up at this location.";
+    }else{
+        var towmsg = result["towing"];
+    }
+    var towingmsg 
+    $('#timeleft').html('<img id="carImg" src="/static/img/041-car.png" />' + result["message"]);
+    $('#towingdiv').html('<img id="towImg" src="/static/img/tow-truck.png" />' + towmsg);
     $('#towImg')[0].style.width = '60px';
-    var latlng = {'lat': result['geolocation']['lat'], 
-                  'lng': result['geolocation']['lng']}
-    map.setCenter(latlng);
-    infoWindow.setPosition(latlng);
+    // var latlng = {'lat': result['geolocation']['lat'], 
+    //               'lng': result['geolocation']['lng']}
+    // map.setCenter(latlng);
+    // infoWindow.setPosition(latlng);
 }
 
 function submitAddress(evt){

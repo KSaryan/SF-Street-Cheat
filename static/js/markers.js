@@ -1,11 +1,13 @@
 var allMarkers = []
-
+var allNums = []
 
 function removeMarkers(){
   for(i=0; i<allMarkers.length; i++){
       allMarkers[i].setMap(null);
   }
   allMarkers=[];
+  $('#' + (i).toString()).hide()
+  allNums = []
 }
 
 function showLocations(result){
@@ -26,18 +28,24 @@ function showLocations(result){
           }
         }
       }
+      var num = (result[key]['num']).toString();
       var marker = new google.maps.Marker({map: map,
                                            position: myLatLng,
                                            title: text.toString(),
-                                           category: 0
+                                           category: 0,
+                                           num: num,
+                                           icon: '/static/img/red_MarkerP.png'
                                           });
+
       allMarkers.push(marker)
 
       var infowindow = new google.maps.InfoWindow({
           content: text.toString()
       });
 
-      $('#placescol').prepend('<button>' + text.toString() + "</button>")
+      $('#placesdiv').prepend('<button class="btn-default markerbtn placebtnclass" id =' + num + ' >' + text.toString() + "</button><br>"); 
+     
+      allNums.push(num);
 
       google.maps.event.addListener(marker,'click', (function(marker,text,infowindow){ 
         return function() {

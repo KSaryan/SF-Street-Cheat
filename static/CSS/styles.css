@@ -1,56 +1,48 @@
 #map {
-  /*float: right;*/
-  height: 40em;
-  width: 100%;
-    }
-#map2 {
-  /*float: right;*/
-  height: 50em;
-  width: 100%;
-}
-h1{
-  color: green;
+  height: 60em;
 }
 .hidden{
   display: none;
 }
-/* #forms {
-  width: 30em;
-  float: left;
-}*/
 #homediv{
   width: 25em;
-  float: left;
 }
 #workdiv{
   width: 25em;
-  float: right;
-}
+ }
 #recentdiv{
   width: 25em;
-  float: right;
+}
+#placesdiv{
+  height: 30em;
+  overflow: scroll;
 }
 .btn{
   background-color: DarkSlateGray !important;
   color: white !important; 
 }
 .brand{
-  size: 20em;
   color: white;
+  font-size: 4em !important;
+}
+.brand:hover{
+  color: black;
 }
 
-button{
-  color: white !important;
+.btn-default{
+  color: green;
 }
 .navbar{
-  height: 10% !important;
-  margin-bottom: 0px !important;
+  height: 15% !important;
+  margin-bottom: 10px !important;
+  margin-left: 0 !important;
 }
 .container{
   padding-right: 0px !important;
   padding-left: 0px !important;
   margin-right: 0px !important;
   margin-left: 0px !important;
+  width: 1375px !important;
 }
 #img.source-image {
   width: 100%;
@@ -60,23 +52,182 @@ button{
 }
 
 #homepagediv {  
-    /*background: url('/static/img/heatmap.png') no-repeat;*/
-    background: url('/static/img/heatmap.png') no-repeat fixed bottom;
-    /*background-image: url('/static/img/heatmap.png') ;*/
-    /*background-repeat: no-repeat;*/
+    background: url('/static/img/sf-street.jpg') no-repeat fixed bottom;
     background-size: 100%;
     height: 100%;
+   /* margin-top: 10px;*/
 }
 
 html{
   height: 100%;
 }
-body{
-  
+
+#parkbtn2{
+  margin-top: -10px;
+  padding-right: 80px;
+  font-size: 30px !important;
+}
+
+#mapcol{
+  height: 100%;
+  padding: 0 !important;
+}
+
+body{  
   height: 90% !important;
   margin: 0 !important;
-
+  padding: 0 !important;
+  line-height: 1.7em !important;
 }
+
+#navbarDropdownMenuLink {
+  font-size: 30px;
+  margin-top: -15px;
+  padding-top: 0px;
+}
+
+#homepagebtn{
+  vertical-align: center;
+  margin: auto !important;
+  max-height: 7em;
+  min-height: 7em;
+  max-width: 7em;
+  min-width: 7em;
+  border-radius: 50%;
+  font-size: 2em;
+  display: block;
+  margin-top: 4em;
+  padding: 0;
+  text-decoration: none !important;
+}
+
+
+#textbtns{
+  margin: 5px;
+}
+
+#markerbtns{
+  margin: 5px;
+}
+
+#addressbtn{
+  margin-top: 10px;
+}
+
+.loginbtn{
+  margin-top: 5px !important;
+  padding-top: 0px !important;
+  color: white; 
+  font-size: 30px;
+}
+
+.nav-linl:hover{
+  color: black;
+}
+#message3{
+  margin-bottom: 80px;
+}
+
+
+
+@import url(http://fonts.googleapis.com/css?family=Roboto);
+
+/****** LOGIN MODAL ******/
+.loginmodal-container {
+  padding: 30px;
+  max-width: 350px;
+  width: 100% !important;
+  background-color: #F7F7F7;
+  margin: 0 auto;
+  border-radius: 2px;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  font-family: roboto;
+}
+
+.loginmodal-container h1 {
+  text-align: center;
+  font-size: 1.8em;
+  font-family: roboto;
+}
+
+.loginmodal-container input[type=submit] {
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.loginmodal-container input[type=text], input[type=password] {
+  height: 44px;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 10px;
+  -webkit-appearance: none;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-top: 1px solid #c0c0c0;
+  /* border-radius: 2px; */
+  padding: 0 8px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+.loginmodal-container input[type=text]:hover, input[type=password]:hover {
+  border: 1px solid #b9b9b9;
+  border-top: 1px solid #a0a0a0;
+  -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.loginmodal {
+  text-align: center;
+  font-size: 14px;
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+  height: 36px;
+  padding: 0 8px;
+/* border-radius: 3px; */
+/* -webkit-user-select: none;
+  user-select: none; */
+}
+
+.loginmodal-submit {
+ /* border: 1px solid #3079ed; */
+  border: 0px;
+  color: white !important;
+  text-shadow: 0 1px rgba(0,0,0,0.1); 
+  background-color: DarkSlateGray !important;
+  padding: 17px 0px;
+  font-family: roboto;
+  font-size: 14px;
+  /*background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#4787ed)); */
+}
+
+.loginmodal-submit:hover {
+  border: 1px solid #2f5bb7; 
+  border: 0px;
+  text-shadow: 0 1px rgba(0,0,0,0.3);
+  background-color: DarkSlateGray;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#357ae8)); 
+}
+
+.loginmodal-container a {
+  text-decoration: none;
+  color: #666;
+  font-weight: 400;
+  text-align: center;
+  display: inline-block;
+  opacity: 0.6;
+  transition: opacity ease 0.5s;
+} 
+
+.login-help{
+  font-size: 12px;
+}
+
+
 /*.homebody{
   background-image: url("heatmap.png");
 }*/

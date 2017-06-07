@@ -40,7 +40,6 @@ def log_out():
     """logs out user"""
 
     del session['login']
-    flash('Successfully loged out')
 
     return redirect ('/')
 
@@ -103,7 +102,6 @@ def create_user():
     db.session.add(user)
     db.session.commit()
     session['login']= user.user_id
-    flash('Thank you for creating an account')
     return redirect('/parking')
 
 
@@ -298,7 +296,7 @@ def find_nearby_cleanings():
     for i in range (len(closest_places)):
         item = closest_places[i]
         message = "Try parking on %s. %s" %(item[3], item[2])
-        results[str(i)] = {"km": item[0], "coordinates": item[1], "message": message }
+        results[str(i)] = {"km": item[0], "coordinates": item[1], "message": message, "num": i}
     return jsonify(results)
 
 
@@ -381,7 +379,13 @@ def get_all_locations():
     all_cleanings = {'all_geos': geos}
     return jsonify(all_cleanings)
 
-
+@app.route('/geo_for_map')
+def get_geo_for_map():
+    address = request.args.get("address")
+    street = request.args.get("street").replace("-", " ")
+    geo = find_geolocation(address, street)
+    print geo
+    return jsonify(geo)
   
 if __name__ == "__main__":
 

@@ -4,7 +4,7 @@
 {% block content %}
 <nav class="navbar navbar-dark" style="background-color: DarkSlateGray;">
   <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
+
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
@@ -16,10 +16,10 @@
     </div>
 
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="/parking" style="color: white;"> Park</a></li>
+        <li><a id="parkbtn2" href="/parking" style="color: white; vertical-align: center; font-size: 20px;"> Park My Car</a></li>
       </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+    </div>
+  </div>
 </nav>
 
 
@@ -30,7 +30,7 @@
             {% if home %}
                 <div class="panel panel-success" id="homepanel" style="vertical-align: middle;">
                     <div class="panel-heading">Home Address</div>
-                    <div id="homediv" class="panel-body">{{ home[0] }} {{ home[1] }}<br>
+                    <div id="homediv" class="panel-body"><h4>{{ home[0] }} {{ home[1] }}</h4><br>
                     <b>Next Cleaning: </b>{{ home[2] }}</div>
                 </div>
             {% endif %}
@@ -59,8 +59,8 @@
             {% if work %}
                 <div class="panel panel-success" id="workpanel" style="vertical-align: middle;">
                     <div class="panel-heading">Work Address</div>
-                    <div id="workdiv" class="panel-body"><h4>{{ work[0] }} {{ work[1] }}<br><br>
-                <b>Next Cleaning: </b>{{ work[2] }}</h4></div>
+                    <div id="workdiv" class="panel-body"><h4>{{ work[0] }} {{ work[1] }}</h4><br>
+                <b>Next Cleaning: </b>{{ work[2] }}</div>
                 </div>
             {% endif %}
             <button class="btn btn-default" id="workbtn">Update Work Address</button>
@@ -99,7 +99,7 @@
             {% if recent %}
                 <div class="panel panel-success" id="recentpanel" style="vertical-align: middle;">
                     <div class="panel-heading">Last Place You Parked</div>
-                    <div id="recentdiv" class="panel-body">{{ recent[0] }} {{ recent[1] }}<br><b>Next Cleaning:</b> {{ recent[2] }}</div>
+                    <div id="recentdiv" class="panel-body"><h4>{{ recent[0] }} {{ recent[1] }}</h4><br><b>Next Cleaning:</b> {{ recent[2] }}</div>
                 </div>
             {% endif %}
             <button class="btn btn-default" id="recentbtn">Update Recent Address</button>

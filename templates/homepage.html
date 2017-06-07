@@ -16,17 +16,33 @@
     </div>
 
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="/login" style="color: white;">Log In</a></li>
+        <li><a href="#" class ="loginbtn" data-toggle="modal" data-target="#login-modal">Login</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
 <div id="homepagediv" class="container-fluid col-xs-12">
-    <h3 style="color: white;">
+   <div id="message3"><h3 style="color: white;">
         Don't Let Street Cleaning Ruin Your Day
-    </h3>
-
-    <a href='/parking'> <button> Carefree Parking</button></a>
+    </h3> </div>
+    <a href='/parking'> <button id="homepagebtn" class="btn btn-default" > No Worries <br> Parking</button></a>
 </div>
+
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+          <div class="modal-dialog">
+                <div class="loginmodal-container">
+                    <h1>Login to Your Account</h1><br>
+                  <form action='/verify_user' method="POST">
+                    <input type="text" name="email" placeholder="Username">
+                    <input type="password" name="password" placeholder="Password">
+                    <input type="submit" name="login" class="login loginmodal-submit" value="Login">
+                  </form>
+                    
+                  <div class="login-help">
+                    <a href="#">Register</a> 
+                  </div>
+                </div>
+            </div>
+          </div>
    
 {% endblock %}
