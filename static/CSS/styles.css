@@ -1,17 +1,21 @@
 #map {
   height: 60em;
 }
+.alert{
+  margin-bottom: .25em !important;
+}
 .hidden{
   display: none;
 }
-#homediv{
-  width: 25em;
+#home{
+  margin-left: 1em;
 }
-#workdiv{
-  width: 25em;
- }
-#recentdiv{
-  width: 25em;
+#work{
+  margin-left: -.5em;
+}
+#recent{
+  padding-right: 0;
+  margin-left: -.5em;
 }
 #placesdiv{
   height: 30em;
@@ -42,10 +46,16 @@
   padding-left: 0px !important;
   margin-right: 0px !important;
   margin-left: 0px !important;
-  width: 1375px !important;
+/*  width: 1375px !important;*/
 }
+
+.invisibleplacebtnclass{
+  border: 0;
+  padding: 0;
+}
+
 #img.source-image {
-  width: 100%;
+ /* width: 100%;*/
   position: absolute;
   top: 0;
   left: 0;
@@ -60,6 +70,10 @@
 
 html{
   height: 100%;
+}
+
+#ui{
+  size: 2em !important;
 }
 
 #parkbtn2{
@@ -225,6 +239,14 @@ body{
 
 .login-help{
   font-size: 12px;
+}
+
+#userinfo{
+  margin-top: 0;
+}
+
+#userinfodiv{
+  margin-bottom: 2em;
 }
 
 

@@ -68,6 +68,10 @@ def verify_user():
         if bcrypt.checkpw(password, hashedpass):
             session['login'] = q.user_id
             return redirect('/parking')
+        else:
+            flash("Username or password not found")
+            return redirect ('/')
+
     else:
         flash("Username or password not found")
         return redirect ('/')
@@ -77,12 +81,12 @@ def verify_user():
 def create_user():
     """Creates new user in database"""
 
-    password = request.form.get("password").rstrip()
+    password = request.form.get("new_password").rstrip()
     password = password.encode('utf8') 
     hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-    email = request.form.get("email").rstrip()
+    email = request.form.get("new_email").rstrip()
     email = email.lower()
-    phone = request.form.get("phone")
+    phone = request.form.get("new_number")
     if phone:
         phone = re.sub(r"[\-\(\)\.\s]+", "", phone)
 
@@ -359,25 +363,25 @@ def my_places():
         return redirect('/login')
 
 
-@app.route('/heatmap')
-def show_heat_map():
-    return render_template('map.html')
+# @app.route('/heatmap')
+# def show_heat_map():
+#     return render_template('map.html')
 
-@app.route('/get_all_locations.json')
-def get_all_locations():
-    print "1"
-    all_cleanings = Cleaning.query.all()
-    geos = []
-    for cleaning in all_cleanings:
-        print '2'
-        locations = Location.query.filter(Location.loc_id == cleaning.loc_id).all()
-        for location in locations:
-            print '3'
-            for geo in location.lng_lat:
-                print '4'
-                geos.append([float(geo[0]), float(geo[1])])
-    all_cleanings = {'all_geos': geos}
-    return jsonify(all_cleanings)
+# @app.route('/get_all_locations.json')
+# def get_all_locations():
+#     print "1"
+#     all_cleanings = Cleaning.query.all()
+#     geos = []
+#     for cleaning in all_cleanings:
+#         print '2'
+#         locations = Location.query.filter(Location.loc_id == cleaning.loc_id).all()
+#         for location in locations:
+#             print '3'
+#             for geo in location.lng_lat:
+#                 print '4'
+#                 geos.append([float(geo[0]), float(geo[1])])
+#     all_cleanings = {'all_geos': geos}
+#     return jsonify(all_cleanings)
 
 @app.route('/geo_for_map')
 def get_geo_for_map():

@@ -4,6 +4,7 @@ $('#locationsbtn').on('click', function(){$('#filterbtn').removeClass('hidden');
 
 
 function removeSomeMarkers(num){
+    // give categories to all existing markers
     for(i=0; i<allMarkers.length; i++){
         $('#' + (i).toString()).show()
         allMarkers[i].setMap(map);
@@ -24,15 +25,19 @@ function removeSomeMarkers(num){
         }
         allMarkers[i]['category'] = category
     }
+    
     for(i=1; i<=num; i++){
         for(j=0; j<allMarkers.length; j++){
             if (parseInt(allMarkers[j]['category']) == i){
                 allMarkers[j].setMap(null);
                 var id = allMarkers[j].num;
-                $('#' + (id).toString()).hide();
-        }
-        }
+                $('#' + (id).toString()).animate({
+                                      'marginTop' : "5em" 
+                                       });
+                $('#' + (id).toString()).remove();
     }
+        }
+}
 }
 
 function getRidOfMarkers(evt){

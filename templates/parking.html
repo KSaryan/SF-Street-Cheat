@@ -10,7 +10,7 @@
                       Welcome {{ email }}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <ul>
+                    <ul style="list-style: none;">
                         <li>
                           <a class="dropdown-item" href="/my_places">My Places</a>
                         </li>
@@ -35,6 +35,7 @@
 </nav>
 
 <div id="parkingpage" class="container">
+    <div class="row">
     <div id="mapcol" class="col-xs-9">
         <div id= "map"> </div>
     </div>
@@ -72,7 +73,7 @@
                 </div>
                 <button type="submit" class="btn btn-default" id="addressbtn">When is Street Cleaning?</button>
             </form>
-        </div>
+            </div>
         <div id="section3" class= "hidden">
             <div class="panel panel-success" id="timepanel" style="vertical-align: middle;">
                 <div class="panel-heading">Time to Street Cleaning</div>
@@ -122,22 +123,32 @@
                     </form>
                     <div id='placesdiv'></div>
                 </div>
-            </div>
-    </div>
+       </div>
+    </div> 
+</div>
 </div>
 
 <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
           <div class="modal-dialog">
                 <div class="loginmodal-container">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h1>Login to Your Account</h1><br>
-                  <form action='/verify_user' method="POST">
-                    <input type="text" name="email" placeholder="Username">
-                    <input type="password" name="password" placeholder="Password">
-                    <input type="submit" name="login" class="login loginmodal-submit" value="Login">
-                  </form>
+                      <form action='/verify_user' method="POST">
+                        <input type="text" name="email" placeholder="Username">
+                        <input type="password" name="password" placeholder="Password">
+                        <input type="submit" name="login" class="login loginmodal-submit" value="Login">
+                      </form>
                     
                   <div class="login-help">
-                    <a href="/create_user">Register</a> 
+                    <a id="registerbtn2">Register</a> 
+                    <div id="registerform2" class='hidden'>
+                        <form action='/create_user' method="POST">
+                            <input type="text" name="new_email" placeholder="Username">
+                            <input type="password" name="new_password" placeholder="Password">
+                            <input type="text" name="new_number" placeholder="Phone Number">
+                            <input type="submit" name="register" class="login loginmodal-submit" value="Register">
+                        </form>
+                    </div>    
                   </div>
                 </div>
             </div>
@@ -148,8 +159,8 @@
 <script type="text/javascript" src="/static/js/map.js"></script>
 <script async defer
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0OiwKI95QDFdX-GkLuGipWuYuf-RyEcQ&callback=initMap"></script>
-<script src="/static/js/sweetalert-master/dist/sweetalert.min.js"></script>
-<link rel="stylesheet" type="text/css" href="/static/js/sweetalert-master/dist/sweetalert.css">
+<script src="/static/js/sweetalert/dist/sweetalert.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/js/sweetalert/dist/sweetalert.css">
 <script type="text/javascript" src="/static/js/sendtext.js"></script>
 <script type="text/javascript" src='/static/js/markers.js'></script>
 <script type="text/javascript" src='/static/js/filter.js'></script>

@@ -1,42 +1,59 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1> User information for: {{ user.email }} </h1>
 
-Email: {{ user.email }}<br>
-{% if user.phone %} 
-    Phone Number: ({{ user.phone[:3] }}) {{user.phone[3:6]}} - {{user.phone[6:10]}}
-{% else %}
-    No Phone Number Associated with This Account
-{% endif %}
-<p>
-<form action='/update_user' method="POST">
-Update Information:<br>
-(please fill out all fields)<br>
-Email: <input type="text" name= "email" required="True"><br>
-Password: <input type="password" name="password" required="True">
-<input type='submit' value="Update">
-</form>
-</p>
+<nav class="navbar navbar-dark" style="background-color: DarkSlateGray;">
+  	<div class="container-fluid">
 
-<p>
-<form action='/update_user' method="POST">
-Add or change number:<br>
-New Number: <input type="text" name="number" required="True">
-<input type="submit" name="Update">
-</form>
-</p>
+    <div class="navbar-header" style='color: white;'>
+		<div class='row' id='userinfodiv'>
+			<h1 id='userinfo'> User information for {{ user.email }} </h1>
+		</div>
+		<div id='ui' class='row'>
+			Email: {{ user.email }}
 
-<p>
-    <form action='/' method="POST">
-    <input type='submit' value='logout'>
-    </form>
-</p>
+			<span style="display:inline-block; width: 2em;"></span>
+			{% if user.phone %} 
+			    Phone Number: ({{ user.phone[:3] }}) {{user.phone[3:6]}} - {{user.phone[6:10]}}
+			{% else %}
+			    No Phone Number Associated with This Account
+			{% endif %}
+		</div>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+        <li><a id="parkbtn2" href="/parking" style="color: white; vertical-align: center; font-size: 20px;"> Park My Car</a></li>
+      </ul>
+	
+	</div>
+</nav>
 
-<p>
-    <form action='/parking'>
-    <input type='submit' value='Park'>
-    </form>
-</p>
+<div class= 'container block'>
+	<div class= 'col-xs-4'>
+		<form action='/update_user' method="POST">
 
+			<h2>Update Information:</h2>
+			<div class='form-group'>
+				<label for="email">Email</label>
+		        <input name="email" type="text" class="form-control" placeholder="Email" required="True">
+			</div>
+			<div class='form-group'>
+				<label for='password'>Password</label>
+				<input name="password" type="text" class="form-control" placeholder="Password" require="True">
+			</div>
+			<div class="form-group">
+				<label for="phone">Phone</label>
+				<input name="phone" type="text" class="form-control" placeholder="Phone Number" required="True">
+			</div>
+
+			<button type="submit" class="btn btn-default" >Update Information</button>
+		
+		</form>
+			
+			<br>
+			<form action='/' method="POST">
+			    <button type="submit" class="btn btn-default" >Log Out</button>
+			</form>
+
+	</div>
+</div>
 
 {% endblock %}

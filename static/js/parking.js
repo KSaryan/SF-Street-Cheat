@@ -55,3 +55,5 @@ function getGeoForMap(){
     $.get('/geo_for_map', data, changeMap)
 }
 $('#usethisaddress').on('click', getGeoForMap)
+
+$('#registerbtn2').on('click', function(){$('#registerform2').removeClass('hidden');});

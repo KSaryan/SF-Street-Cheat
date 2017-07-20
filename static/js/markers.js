@@ -10,25 +10,49 @@ function removeMarkers(){
   allNums = []
 }
 
+function adjustMap(){
+  var bounds = new google.maps.LatLngBounds();
+  for (var i = 0; i < allMarkers.length; i++) {
+    bounds.extend(allMarkers[i].getPosition());
+  }
+  // map.setOptions({ minZoom: 13, maxZoom: 20});
+  map.fitBounds(bounds);
+}
+
+function createButton(num, text){
+  $('#placesdiv').prepend('<button class="btn-default markerbtn placebtnclass" id =' + num + ' >' + text + "</button><br>"); 
+  allNums.push(num);
+}
+
+function addInfoWindow(text, marker){
+  var infowindow = new google.maps.InfoWindow({
+          content: text
+      });
+
+  google.maps.event.addListener(marker,'click', (function(marker,text,infowindow){ 
+    return function() {
+      infowindow.setContent(text);
+      infowindow.open(map,marker);
+  };
+
+  })(marker,text,infowindow)); 
+}
+
 function showLocations(result){
   removeMarkers();
+  var latLngs = new Set([]);
   for (key in result){
-      var text = result[key]['message']
-      var myLatLng = {lat: result[key]['coordinates'][1], lng: result[key]['coordinates'][0]};
-      
-      if (allMarkers.length != 0) {
-        for (i=0; i < allMarkers.length; i++){
-          var existingMarker = allMarkers[i];
-          var lat = existingMarker.getPosition().lat();
-          var lng = existingMarker.getPosition().lng();
-          if (myLatLng['lat'] == lat && myLatLng['lng'] == lng) {
-            var newLat = myLatLng['lat'] + .00005;
-            var newLng = myLatLng['lng'] + .00005;
-            myLatLng = new google.maps.LatLng(newLat,newLng);
-          }
-        }
-      }
+      var text = (result[key]['message']).toString();
       var num = (result[key]['num']).toString();
+      var newLat = result[key]['coordinates'][1];
+      var newLng = result[key]['coordinates'][0];
+      if (latLngs.has((newLat, newLng))){
+        var newLat = newLat + .00005;
+        var newLng = newLng + .00005;
+      }
+      myLatLng = new google.maps.LatLng(newLat,newLng);
+      latLngs.add((newLat, newLng));
+      
       var marker = new google.maps.Marker({map: map,
                                            position: myLatLng,
                                            title: text.toString(),
@@ -39,29 +63,11 @@ function showLocations(result){
 
       allMarkers.push(marker)
 
-      var infowindow = new google.maps.InfoWindow({
-          content: text.toString()
-      });
+      addInfoWindow(text, marker)
 
-      $('#placesdiv').prepend('<button class="btn-default markerbtn placebtnclass" id =' + num + ' >' + text.toString() + "</button><br>"); 
-     
-      allNums.push(num);
-
-      google.maps.event.addListener(marker,'click', (function(marker,text,infowindow){ 
-        return function() {
-          infowindow.setContent(text);
-          infowindow.open(map,marker);
-      };
-
-      })(marker,text.toString(),infowindow)); 
-    }
-
-  var bounds = new google.maps.LatLngBounds();
-  for (var i = 0; i < allMarkers.length; i++) {
-    bounds.extend(allMarkers[i].getPosition());
-}
-  map.setOptions({ minZoom: 13, maxZoom: 20});
-  map.fitBounds(bounds);
+      createButton(num, text);
+  }
+  adjustMap();
 }
 
 
