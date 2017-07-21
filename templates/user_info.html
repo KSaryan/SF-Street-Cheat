@@ -18,15 +18,16 @@
 			    No Phone Number Associated with This Account
 			{% endif %}
 		</div>
-		</div>
-		<ul class="nav navbar-nav navbar-right">
-        <li><a id="parkbtn2" href="/parking" style="color: white; vertical-align: center; font-size: 20px;"> Park My Car</a></li>
-      </ul>
+	</div>
+	<div class="nav navbar-nav navbar-right">
+        <a id="parkbtn2" href="/parking" style="color: white; vertical-align: center; font-size: 20px;" class="hover-link"> Park My Car</a>
+  	</div>
 	
 	</div>
 </nav>
 
-<div class= 'container block'>
+<div class= 'container'>
+	<div class='row'>
 	<div class= 'col-xs-4'>
 		<form action='/update_user' method="POST">
 
@@ -54,6 +55,7 @@
 			</form>
 
 	</div>
+</div>
 </div>
 
 {% endblock %}

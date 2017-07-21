@@ -2,11 +2,11 @@
 {% block content %}
 <nav class="navbar navbar-dark" style="background-color: DarkSlateGray;"> 
     <div class="container">
-      <a class="brand navbar-brand" href="/">SF StreetCheat</a>
+      <a class="brand navbar-brand hover-link" href="/">SF StreetCheat</a>
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
             {% if email %}
                 <div class="nav-item dropdown navbar-right">
-                    <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <a class="nav-link dropdown-toggle hover-link" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
                       Welcome {{ email }}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -25,21 +25,21 @@
                 </div>
        
             {% else %}
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#" data-toggle="modal" data-target="#login-modal" class= "loginbtn">Login</a></li>
-                </ul>
+                <div class="nav navbar-nav navbar-right">
+                    <a href="#" data-toggle="modal" data-target="#login-modal" class= "hover-link loginbtn ">Login</a>
+                </div>
             {% endif %}     
           
       </div>
     </div>
 </nav>
 
-<div id="parkingpage" class="container">
+<div id="parkingpage" class="container-fluid">
     <div class="row">
-    <div id="mapcol" class="col-xs-9">
+    <div id="mapcol" class="col-xs-8">
         <div id= "map"> </div>
     </div>
-    <div class= "col-xs-3">
+    <div class= "col-xs-4">
       <div id="title"> <h1>Confirm Your Location</h1> </div>
         <form id="adressinfo" role="form">
             <div id="section1">

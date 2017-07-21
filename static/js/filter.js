@@ -2,8 +2,7 @@
 $('#filterbtn').on('click', function(){$('#filterform').removeClass('hidden'); $('#filterbtn').hide();});
 $('#locationsbtn').on('click', function(){$('#filterbtn').removeClass('hidden');})
 
-
-function removeSomeMarkers(num){
+function categorizeMarkers(){
     // give categories to all existing markers
     for(i=0; i<allMarkers.length; i++){
         $('#' + (i).toString()).show()
@@ -25,16 +24,17 @@ function removeSomeMarkers(num){
         }
         allMarkers[i]['category'] = category
     }
-    
+}
+
+function removeSomeMarkers(num){
+    categorizeMarkers();
+    // Remove markers and correspondin buttons
     for(i=1; i<=num; i++){
         for(j=0; j<allMarkers.length; j++){
             if (parseInt(allMarkers[j]['category']) == i){
                 allMarkers[j].setMap(null);
                 var id = allMarkers[j].num;
-                $('#' + (id).toString()).animate({
-                                      'marginTop' : "5em" 
-                                       });
-                $('#' + (id).toString()).remove();
+                $('#' + (id).toString()).hide();
     }
         }
 }
