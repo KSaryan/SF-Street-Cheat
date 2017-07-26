@@ -92,15 +92,10 @@ def create_user():
 
     if db.session.query(User).filter(User.email==email).first():
         flash('There is already an email associated with this account. Please login.')
-        return redirect('/login')
-    else:
-        if len(email) > 30:
-            flash('Password or email too long')
-            return redirect('/login')
-        if phone:
-            if len(phone) != 10:
-                flash("Invalid number. Make sure to include area code.")
-                return redirect('/login')
+        return redirect('/')
+    elif len(phone) != 10:
+        flash("Invalid number. Make sure to include area code.")
+        return redirect('/')
 
     user = User(password=hashed, email=email, phone=phone)
     db.session.add(user)
@@ -118,7 +113,7 @@ def display_user_information():
         return render_template('user_info.html', user=user)
     else:
         flash("Please login in to view")
-        return redirect ('/login')
+        return redirect ('/')
 
 
 @app.route('/update_user', methods=["POST"])

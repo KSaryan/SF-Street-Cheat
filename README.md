@@ -19,32 +19,32 @@ cleaning time. This way they can go about their day or week knowing they won't c
 
 ## <a name="features"></a>Features
 Users can choose to log in or begin using the site
-![alt text](screenshots/homepage.png "Recruiter Home")
+![alt text](screenshots/homepage.png "Homepage")
 
 Their currently location in autofilled and they confirm or fill in another
-![alt text](screenshots/confirm-location.png "All Studies")
+![alt text](screenshots/confirm-location.png "Confirm Location")
 
 The sides of the street that match their location are filled into the dropdown for them to choose from
-![alt text](screenshots/street-side.png "New Study")
+![alt text](screenshots/street-side.png "Street Side")
 
 They get information about street cleaning and towing
-![alt text](screenshots/street-cleaning-info.png "Screener")
+![alt text](screenshots/street-cleaning-info.png "Street Cleaning Info")
 
 They can search for other information about other street clenaing locations in their neighborhood
-![alt text](screenshots/nearby-locations-1.png "Screener")
-![alt text](screenshots/nearby-locations-2.png "Screener")
+![alt text](screenshots/nearby-locations-1.png "Nearby Locations 1")
+![alt text](screenshots/nearby-locations-2.png "Nearby Locations 2")
 
 And filter those locations to match their needs
-![alt text](screenshots/filter-locations.png "Screener")
+![alt text](screenshots/filter-locations.png "Filter Locations")
 
 Once they log in
-![alt text](screenshots/login.png "Search Potential Participants")
+![alt text](screenshots/login.png "Login Modal")
 
 They can receive text reminders
-![alt text](screenshots/text-success.png "Email")
+![alt text](screenshots/text-success.png "Text Confirmation")
 
 Or check on favorite or recent locations
-![alt text](screenshots/my-places.png "Screener")
+![alt text](screenshots/my-places.png "My Places")
 
 
 ## <a name="features"></a>Installation
@@ -70,8 +70,8 @@ Install the dependencies:
 ```
 pip install -r requirements.txt
 ```
-Sign up to use the SendGrid API (https---
-Sign up to use the Twilio API (https---
+Sign up to use the SendGrid API (https://www.twilio.com/try-twilio)
+Sign up to use the Twilio API (https://app.sendgrid.com/signup)
 
 Save your API key in a file called <kbd>secrets.sh</kbd> using this format:
 ```
