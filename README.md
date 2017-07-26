@@ -15,7 +15,7 @@ cleaning time. This way they can go about their day or week knowing they won't c
 <b>APIs:</b> SODA, SendGrid, Twilio, Google Maps<br/>
 
 ## <a name="database-model"></a>Database Model
-![alt text](DataModel-SFSC.png "database model")
+![alt text](DataModel-SFSC-.png "database model")
 
 ## <a name="features"></a>Features
 Users can choose to log in or begin using the site
