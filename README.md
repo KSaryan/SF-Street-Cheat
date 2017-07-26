@@ -1,12 +1,7 @@
 # SF StreetCheat
-SF StreetCheat is a 4 week project that I completed during my time as an software engineering fellow at Hackbright Academy.  
-SF StreetCheat helps San Francisco residents avoid expensive parking tickets. With street cleaning happenign at different time 
-on different sides, different bloacks, and evendifferent sides oft he same black, it can be difficult to remember when you need 
-to move your car. Even if you do check the sign, you cna get distract and forget to move it in time. SF StreetCheat uses the 
-data provided by DataSF through the Soda API, along with the Goggle Maps, SendGrid,  and Twilio APIs to not only show users
-how long they have until street clenaing, but also to send them texts or emails reminding them to move thir car before street 
-cleaning time. This way they can go about their day or week knowing they won't come back to their car only to face a hefty ticket.
-SF StreetCheat also helps users find nearby streets that have street cleaning times that better fit their needs.
+SF StreetCheat is a 4 week project that I completed during my time as an software engineering fellow at Hackbright Academy. SF StreetCheat helps San Francisco residents avoid expensive parking tickets. With street cleaning happenign at different time on different sides, different bloacks, and evendifferent sides oft he same black, it can be difficult to remember when you need 
+to move your car. Even if you do check the sign, you cna get distract and forget to move it in time. SF StreetCheat uses the data provided by DataSF through the Soda API, along with the Goggle Maps, SendGrid,  and Twilio APIs to not only show users how long they have until street clenaing, but also to send them texts or emails reminding them to move thir car before street 
+cleaning time. This way they can go about their day or week knowing they won't come back to their car only to face a hefty ticket. SF StreetCheat also helps users find nearby streets that have street cleaning times that better fit their needs.
 
 ## Contents
 * [Technologies](#technologies)
