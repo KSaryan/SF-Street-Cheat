@@ -59,7 +59,7 @@ Install PostgreSQL (Mac OSX)
 Clone or fork this repo:
 
 ```
-https://github.com/AmaStephano/Recruiter
+https://github.com/KSaryan/SF-Street-Cheat
 ```
 
 Create and activate a virtual environment inside your Recruiter directory:
@@ -74,18 +74,17 @@ Install the dependencies:
 ```
 pip install -r requirements.txt
 ```
-Sign up to use the Facebook API (https://developers.facebook.com/)
+Sign up to use the SendGrid API (https---
+Sign up to use the Twilio API (https---
 
 Save your API key in a file called <kbd>secrets.sh</kbd> using this format:
 ```
-export APP_ID="YOUR_KEY_GOES_HERE"
+export TWILIO_ACCOUNT_SID="YOUR_ACCOUNT_SID_GOES_HERE"
+export TWILIO_AUTH_TOKEN="YOUR_AUTH_TOKEN_GOES_HERE"
+export TWILIO_NUMBER="YOUR_NUMBER_GOES_HERE"
+export SENDGRID_API_KEY="YOUR_API_KEY_GOES_HERE"
 ```
 
-Also in secrets.sh add the infomration for the mail server you want to use in this format:
-```
-export MAIL_PASSWORD="YOUR_PASSWORD_HERE"
-export MAIL_USERNAME="YOUR_USERNAME_HERE"
-```
 Source your keys from your secrets.sh file into your virtual environment:
 
 ```
@@ -107,4 +106,4 @@ Run the app:
 python server.py
 ```
 
-You can now navigate to 'localhost:5000/' to access Recruiter.
+You can now navigate to 'localhost:5000/' to access SF StreetCheat.
