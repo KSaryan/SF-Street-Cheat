@@ -18,32 +18,33 @@ cleaning time. This way they can go about their day or week knowing they won't c
 ![alt text](screenshots/database diagram dark version.png "database model")
 
 ## <a name="features"></a>Features
-users can choose to log in or begin using the site
-![alt text](screenshots/RecruiterHome.png "Recruiter Home")
+Users can choose to log in or begin using the site
+![alt text](screenshots/homepage.png "Recruiter Home")
 
 Their currently location in autofilled and they confirm or fill in another
-![alt text](screenshots/Recruiter_Studies.png "All Studies")
+![alt text](screenshots/confirm-location.png "All Studies")
 
 The sides of the street that match their location are filled into the dropdown for them to choose from
-![alt text](screenshots/Recruiter_NewStudy.png "New Study")
+![alt text](screenshots/street-side.png "New Study")
 
 They get information about street cleaning and towing
-![alt text](screenshots/Recruiter_Screener.png "Screener")
+![alt text](screenshots/street-cleaning-info.png "Screener")
 
 They can search for other information about other street clenaing locations in their neighborhood
-![alt text](screenshots/Recruiter_Screener.png "Screener")
+![alt text](screenshots/nearby-locations-1.png "Screener")
+![alt text](screenshots/nearby-locations-2.png "Screener")
 
 And filter those locations to match their needs
-![alt text](screenshots/Recruiter_Screener.png "Screener")
+![alt text](screenshots/filter-locations.png "Screener")
 
 Once they log in
-![alt text](screenshots/Recruiter_Search.png "Search Potential Participants")
+![alt text](screenshots/login.png "Search Potential Participants")
 
 They can receive text reminders
-![alt text](screenshots/Recruiter_Email.png "Email")
+![alt text](screenshots/text-success.png "Email")
 
 Or check on favorite or recent locations
-![alt text](screenshots/Recruiter_Screener.png "Screener")
+![alt text](screenshots/my-places.png "Screener")
 
 
 ## <a name="features"></a>Installation
