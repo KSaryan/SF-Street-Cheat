@@ -1,11 +1,11 @@
 # SF StreetCheat
-SF StreetCheat is a 4 week project that I completed during my time as an software engineering fellow at Hackbright Academy. SF StreetCheat helps San Francisco residents avoid expensive parking tickets. With street cleaning happenign at different time on different sides, different bloacks, and evendifferent sides oft he same black, it can be difficult to remember when you need 
-to move your car. Even if you do check the sign, you cna get distract and forget to move it in time. SF StreetCheat uses the data provided by DataSF through the Soda API, along with the Goggle Maps, SendGrid,  and Twilio APIs to not only show users how long they have until street clenaing, but also to send them texts or emails reminding them to move thir car before street 
+SF StreetCheat is a 4 week project that I completed during my time as a software engineering fellow at Hackbright Academy. It is designed to help San Francisco residents avoid expensive parking tickets. With street cleaning happening at different time on different sides, different blocks, and even different sides oft he same black, it can be difficult to remember when you need 
+to move your car. Even if you do check the sign, you can get distracted and forget to move it in time. SF StreetCheat uses the data provided by DataSF through the Soda API, along with the Goggle Maps, SendGrid,  and Twilio APIs to not only show users how long they have until street cleaning, but also to send them texts or emails reminding them to move their car before street 
 cleaning time. This way they can go about their day or week knowing they won't come back to their car only to face a hefty ticket. SF StreetCheat also helps users find nearby streets that have street cleaning times that better fit their needs.
 
 ## Contents
 * [Technologies](#technologies)
-* [Database Model](#database model)
+* [Database Model](#database-model)
 * [Features](#features)
 * [Installation](#install)
 
@@ -14,8 +14,8 @@ cleaning time. This way they can go about their day or week knowing they won't c
 <b>Frontend:</b> JavaScript, jQuery, AJAX, Jinja2, Bootstrap, HTML5, CSS3<br/>
 <b>APIs:</b> SODA, SendGrid, Twilio, Google Maps<br/>
 
-## <a name="database model"></a>Database Model
-![alt text](screenshots/database diagram dark version.png "database model")
+## <a name="database-model"></a>Database Model
+![alt text](DataModel-SFSC.png "database model")
 
 ## <a name="features"></a>Features
 Users can choose to log in or begin using the site
@@ -24,13 +24,13 @@ Users can choose to log in or begin using the site
 Their currently location in autofilled and they confirm or fill in another
 ![alt text](screenshots/confirm-location.png "Confirm Location")
 
-The sides of the street that match their location are filled into the dropdown for them to choose from
+The sides of the street that match their location are filled into the drop down for them to choose from
 ![alt text](screenshots/street-side.png "Street Side")
 
 They get information about street cleaning and towing
 ![alt text](screenshots/street-cleaning-info.png "Street Cleaning Info")
 
-They can search for other information about other street clenaing locations in their neighborhood
+They can search for other information about other street cleaning locations in their neighborhood
 ![alt text](screenshots/nearby-locations-1.png "Nearby Locations 1")
 ![alt text](screenshots/nearby-locations-2.png "Nearby Locations 2")
 
