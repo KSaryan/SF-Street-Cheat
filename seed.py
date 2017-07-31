@@ -203,7 +203,6 @@ def create_towings():
 
 
 if __name__ == "__main__":
-    #later can import app from server
     app = Flask(__name__)
     connect_to_db(app)
     db.create_all()

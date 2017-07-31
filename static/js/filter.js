@@ -28,7 +28,7 @@ function categorizeMarkers(){
 
 function removeSomeMarkers(num){
     categorizeMarkers();
-    // Remove markers and correspondin buttons
+    // Remove markers and corresponding buttons
     for(i=1; i<=num; i++){
         for(j=0; j<allMarkers.length; j++){
             if (parseInt(allMarkers[j]['category']) == i){

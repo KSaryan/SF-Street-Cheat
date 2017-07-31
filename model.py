@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta, date
 import pytz
 import bcrypt
-# from server import app
 
 db = SQLAlchemy()
 
@@ -332,7 +331,6 @@ def connect_to_db(app, db_uri = "postgres:///parking"):
 
 
 if __name__ == "__main__":
-    #can import app from server later
     app = Flask(__name__)
     connect_to_db(app)
     print "Connected to DB."
