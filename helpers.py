@@ -35,7 +35,7 @@ def get_towing_locs(address, street):
   else: 
       locations = Tow_Location.query.filter(Tow_Location.street_id==street1.street_id,
                                         Tow_Location.lt_from_address <= address, 
-                                        Tow_Location.lt_to_address >= address).all()
+                                        Tow_Location.lt_to_address >= address).options(db.joinedload('towings')).all()
 
   return locations
 
@@ -50,9 +50,9 @@ def get_towings(towing_locs):
 
   towings_list = []
   for loc in towing_locs:
-    loc_id = loc.tow_loc_id
-    towings = Towing.query.filter(Towing.tow_loc_id==loc_id).all()
-    towings_list.extend(towings)
+    # loc_id = loc.tow_loc_id
+    # towings = Towing.query.filter(Towing.tow_loc_id==loc_id).all()
+    towings_list.extend(loc.towings)
   # print towings_list
   next_towings = []
   for towing in towings_list:
@@ -67,9 +67,9 @@ def get_towing_message(towings):
   t_mesages = []
   if towings:
       for t in towings:
-          t_side = t.tow_locations.tow_sides.tow_side_name
+          t_side = t.tow_location.tow_side.tow_side_name
           t_side = (t_side.rstrip(" Sides")).lower()
-          t_message = "There is towing on the %s side(s) of this street on %s, at %s."%(t_side, t.days.day_name, t.start_time)
+          t_message = "There is towing on the %s side(s) of this street on %s, at %s."%(t_side, t.day.day_name, t.start_time)
           t_mesages.append(t_message)
   towing_message = ""
   for message in t_mesages:
@@ -93,7 +93,7 @@ def find_next_cleaning(street_cleanings, now):
                 month = now.strftime("%B")
                 date = now.strftime("%d")
                 message =  "Next cleaning is in %s days. On %s, %s %s. From %s to %s (military time)." %(days, 
-                                                                                                         cleaning.days.day_name, 
+                                                                                                         cleaning.day.day_name, 
                                                                                                          month, 
                                                                                                          date, 
                                                                                                          cleaning.start_time, 
@@ -146,15 +146,15 @@ def get_sides_for_this_location(street, address):
     if int(address) % 2 == 0:
         locations = Location.query.filter(Location.street_id==street1.street_id,
                                           Location.rt_from_address <= address, 
-                                          Location.rt_to_address >= address).all()
+                                          Location.rt_to_address >= address).options(db.joinedload('side')).all()
     else: 
         locations = Location.query.filter(Location.street_id==street1.street_id,
                                           Location.lt_from_address <= address, 
-                                          Location.lt_to_address >= address).all()
+                                          Location.lt_to_address >= address).options(db.joinedload('side')).all()
     sides = []
-    for location in locations:
-      if location.sides:
-        sides.append(location.sides.side_name)
+    for loc in  locations:
+      if loc.side:
+        sides.append(loc.side.side_name)
     return sides
 
 
@@ -218,7 +218,7 @@ def find_nearby_places(address, street, side):
           c = 2 * asin(sqrt(a)) 
           km = 6367 * c
 # stance = math.sqrt((-Decimal())**2 + (-Decimal())**2)
-          distances.append([km, coordinate, location.loc_id, location.streets.street_name])
+          distances.append([km, coordinate, location.loc_id, location.street.street_name])
       distances = sorted(distances, key=itemgetter(0))
       best_distance = distances[1]
       overall_distances.append(best_distance)

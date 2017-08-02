@@ -63,9 +63,9 @@ class Location(db.Model):
     side_id = db.Column(db.Integer, db.ForeignKey('sides.side_id'))
     lng_lat = db.Column(db.ARRAY(db.Numeric, dimensions=2), nullable=False)
     
-    sides = db.relationship('Side', backref='locations')
-    streets = db.relationship('Street', backref='locations')
-    neighborhoods = db.relationship('Neighborhood', backref='neighborhoods')
+    side = db.relationship('Side', backref='locations')
+    street = db.relationship('Street', backref='locations')
+    neighborhood = db.relationship('Neighborhood', backref='locations')
 
     def __repr__ (self):
         """Displayed when called"""
@@ -89,8 +89,8 @@ class Cleaning(db.Model):
     week_of_mon = db.Column(db.Integer, nullable=False)
     day_id = db.Column(db.String(4), db.ForeignKey('days.day_id'))
 
-    locations = db.relationship('Location', backref='cleanings')
-    days = db.relationship('Day', backref='cleanings')
+    location = db.relationship('Location', backref='cleanings')
+    day = db.relationship('Day', backref='cleanings')
 
     def __repr__ (self):
         """Displayed when called"""
@@ -144,9 +144,9 @@ class FaveLocation(db.Model):
     loc_id = db.Column(db.Integer, db.ForeignKey('locations.loc_id'))
     type_id = db.Column(db.String(3), db.ForeignKey('types.type_id'))
 
-    locations = db.relationship('Location', backref='fls')
-    users = db.relationship('User', backref='fls')
-    types = db.relationship('Type', backref='fls')
+    location = db.relationship('Location', backref='fls')
+    user = db.relationship('User', backref='fls')
+    typed = db.relationship('Type', backref='fls')
 
     def __repr__ (self):
         """Displayed when called"""
@@ -178,7 +178,7 @@ class MessageToSend(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     time = db.Column(db.DateTime, nullable=False)
 
-    users = db.relationship('User', backref='messages') 
+    user = db.relationship('User', backref='messages') 
 
     def __repr__ (self):
         """Displayed when called"""
@@ -200,8 +200,8 @@ class Tow_Location(db.Model):
     lt_to_address = db.Column(db.Integer, nullable=False)
     tow_side_id = db.Column(db.Integer, db.ForeignKey('tow_sides.tow_side_id'))
     
-    tow_sides = db.relationship('Tow_Side', backref='tow_locations')
-    streets = db.relationship('Street', backref='tow_locations')
+    tow_side = db.relationship('Tow_Side', backref='tow_locations')
+    street = db.relationship('Street', backref='tow_locations')
 
     def __repr__ (self):
         """Displayed when called"""
@@ -221,8 +221,8 @@ class Towing(db.Model):
     start_time = db.Column(db.String(20), nullable=False)
     day_id = db.Column(db.String(4), db.ForeignKey('days.day_id'))
 
-    tow_locations = db.relationship('Tow_Location', backref='towings')
-    days = db.relationship('Day', backref='towings')
+    tow_location = db.relationship('Tow_Location', backref='towings')
+    day = db.relationship('Day', backref='towings')
 
     def __repr__ (self):
         """Displayed when called"""

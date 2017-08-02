@@ -75,6 +75,7 @@ html{
 
 #ui{
   size: 2em !important;
+  margin-top: -.5em;
 }
 
 #parkbtn2{
@@ -175,7 +176,7 @@ body{
 }
 
 .loginmodal-container input[type=email], input[type=password], input[type=tel]{
-  height: 44px;
+  height: 34px;
   font-size: 16px;
   width: 100%;
   margin-bottom: 10px;
@@ -250,10 +251,3 @@ body{
 #userinfodiv{
   margin-bottom: 2em;
 }
-
-
-/*.homebody{
-  background-image: url("heatmap.png");
-}*/
-/* @media screen and (min-width: 1400px) {   .modal-text-area-center {     margin-top: 15%;   } }
-6:46 PM*/
