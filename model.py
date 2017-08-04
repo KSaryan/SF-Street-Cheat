@@ -307,9 +307,9 @@ def example_data():
                         week_of_mon = 3,
                         day_id = 'Mon')
 
-    day = Day(day_id = 'Thu', day_name = 'Thursday')
-    day2 = Day(day_id = 'Fri', day_name ='Friday')
-    day3 = Day(day_id = 'Mon', day_name ='Monday')
+    day = Day(day_id = 'Thu', day_name = 'Thursday', day_short="Th")
+    day2 = Day(day_id = 'Fri', day_name ='Friday', day_short="Fr")
+    day3 = Day(day_id = 'Mon', day_name ='Monday', day_short="Mo")
     type1 = Type(type_id="hom", type_name="home")
     type2 = Type(type_id="wor", type_name="work")
     type3 = Type(type_id="las", type_name="last")

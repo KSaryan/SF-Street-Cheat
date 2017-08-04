@@ -80,25 +80,19 @@ class TestRoutesLogedIn(TestCase):
         """tests index route as a get request"""
 
         result = self.client.get('/', follow_redirects=True)
-        self.assertIn("How Long Until Street Cleaning", result.data)
-
-    def test_homepage_loged_in(self):
-        """tests index route as a post request (logging out user)"""
-
-        result = self.client.post('/', follow_redirects=True)
-        self.assertIn("Don't Let Street Cleaning Ruin Your Day", result.data)
+        self.assertIn("Confirm Your Location", result.data)
 
     def test_login_loged_in(self):
         """tests login route"""
 
         result = self.client.get('/login', follow_redirects=True)
-        self.assertIn("How Long Until Street Cleaning", result.data)
+        self.assertIn("Confirm Your Location", result.data)
 
     def test_parking_loged_in(self):
         """tests parking route"""
 
         result = self.client.get('/parking')
-        self.assertIn("How Long Until Street Cleaning", result.data)
+        self.assertIn("Confirm Your Location", result.data)
         self.assertIn("Get A Text Reminder", result.data)
 
     def test_my_places_loged_in(self):
@@ -128,7 +122,7 @@ class TestRoutesLogedIn(TestCase):
         """tests add_fave_loc route"""
 
         result = self.client.get('/add_fave_loc', 
-                                 query_string={'street':'California-st', 'address':'50', 'side':'North', 'typefave':'wor'}, 
+                                 query_string={'street':'California-st', 'address':'50', 'side':'North', 'type':'wor'}, 
                                  follow_redirects=True)
         self.assertIn('50 California st', result.data)
 
@@ -171,22 +165,37 @@ class TestRoutesLogedOut(TestCase):
         result = self.client.get('/user_info', follow_redirects=True)
         self.assertIn("Register", result.data)
 
-    #failing
-    def test_user_verify(self):
+    def test_user_verify_fail(self):
         """tests verify_user route"""
 
         result = self.client.post('/verify_user', 
                                   data={'email': 'ksaryan', 'password':'boo'}, 
                                   follow_redirects=True)
-        self.assertIn("How Long Until Street Cleaning", result.data)
+        self.assertIn("Username or password not found", result.data)
+
+    def test_user_verify_success(self):
+        """tests verify_user route"""
+
+        result = self.client.post('/verify_user', 
+                                  data={'email': 'kristine', 'password':'boo'}, 
+                                  follow_redirects=True)
+        self.assertIn("Confirm Your Location", result.data)
 
     def test_create_user(self):
         """tests create_user route"""
 
         result = self.client.post('/create_user', 
-                                  data={'email': 'ksaryan1', 'password':'boo2'}, 
+                                  data={'new_email': 'ksaryan1', 'new_password':'boo2', 'new_number': '818888-8888'}, 
                                   follow_redirects=True)
-        self.assertIn("How Long Until Street Cleaning", result.data)
+        self.assertIn("Confirm Your Location", result.data)
+
+    def test_create_user_bad_number(self):
+        """tests create_user route"""
+
+        result = self.client.post('/create_user', 
+                                  data={'new_email': 'ksaryan1', 'new_password':'boo2', 'new_number': '818888-88889'}, 
+                                  follow_redirects=True)
+        self.assertIn("Invalid number. Make sure to include area code.", result.data)
 
 class TestRoutesWithMoc(TestCase):
     """Tests routes with user loged in and mock function for time"""

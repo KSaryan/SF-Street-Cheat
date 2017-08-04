@@ -201,7 +201,7 @@ def street_cleaning():
             result = {"info_message": next_cleaning[0], 
                       "message": next_cleaning[1] + "/n" + holiday,
                       "geolocation": geolocation,
-                      "towing": towing_mesage}
+                      "towing": towing_message}
 
         else:
             result = {"info_message": next_cleaning[0], 
