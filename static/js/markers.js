@@ -54,6 +54,7 @@ function showLocations(result){
       latLngs.add((newLat, newLng));
       
       var marker = new google.maps.Marker({map: map,
+                                           animation: google.maps.Animation.DROP,
                                            position: myLatLng,
                                            title: text.toString(),
                                            category: 0,

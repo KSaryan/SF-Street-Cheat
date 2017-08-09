@@ -1,10 +1,20 @@
 var map, infoWindow;
 
 function initMap() {
+  setStyle();
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: -34.397, lng: 150.644},
-    zoom: 17
-  });
+    zoom: 17,
+    mapTypeControlOptions: {
+            mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
+                    'styled_map']
+          }
+        });
+
+  map.mapTypes.set('styled_map', styledMapType);
+        map.setMapTypeId('styled_map');        
+
+
   infoWindow = new google.maps.InfoWindow;
   // console.log(infoWindow);
   if (navigator.geolocation) {
