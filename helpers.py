@@ -217,7 +217,7 @@ def find_nearby_places(address, street, side):
           a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
           c = 2 * asin(sqrt(a)) 
           km = 6367 * c
-# stance = math.sqrt((-Decimal())**2 + (-Decimal())**2)
+# distance = math.sqrt((-Decimal())**2 + (-Decimal())**2)
           distances.append([km, coordinate, location.loc_id, location.street.street_name])
       distances = sorted(distances, key=itemgetter(0))
       best_distance = distances[1]

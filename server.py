@@ -316,41 +316,42 @@ def add_a_fave():
 @app.route('/my_places')
 def my_places():
     if 'login' in session:
-        home = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='hom').first()
-        if home:
-            home_location = Location.query.filter(Location.loc_id ==home.loc_id).first()
-            street = Street.query.filter(Street.street_id == home_location.street_id).first()
-            home_street = street.street_name
-            home_address = home.address
-            home_cleanings = Cleaning.query.filter(Cleaning.loc_id==home.loc_id).all()
-            home_next_cleaning = return_next_cleaning(home_cleanings)[1]
-            home = [home_address, home_street, home_next_cleaning]
-        work = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='wor').first()
-        if work:
-            work_location = Location.query.filter(Location.loc_id == work.loc_id).first()
-            street = Street.query.filter(Street.street_id == work_location.street_id).first()
-            work_street = street.street_name
-            work_address = work.address
-            work_cleanings = Cleaning.query.filter(Cleaning.loc_id==work.loc_id).all()
-            work_next_cleaning = return_next_cleaning(work_cleanings)[1]
-            work = [work_address, work_street, work_next_cleaning]
-        recent = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='las').first()
-        if recent:
-            recent_location = Location.query.filter(Location.loc_id==recent.loc_id).first()
-            street = Street.query.filter(Street.street_id == recent_location.street_id).first()
-            recent_street = street.street_name
-            recent_address = recent.address
-            recent_cleanings = Cleaning.query.filter(Cleaning.loc_id==recent.loc_id).all()
-            recent_next_cleaning = return_next_cleaning(recent_cleanings)[1]
-            recent = [recent_address, recent_street, recent_next_cleaning]
+        all_places =[]
+        places = db.session.query(FaveLocation).filter(FaveLocation.user_id==session['login']).all()
+        for place in places:
+            typed = place.typed.type_name
+            place_location = Location.query.filter(Location.loc_id ==place.loc_id).first()
+            street = Street.query.filter(Street.street_id == place_location.street_id).first()
+            place_street = street.street_name
+            place_address = place.address
+            place_cleanings = Cleaning.query.filter(Cleaning.loc_id==place.loc_id).all()
+            place_next_cleaning = return_next_cleaning(place_cleanings)[1]
+            place = [place_address, place_street, place_next_cleaning, typed]
+            all_places.append(place)
+        # work = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='wor').first()
+        # if work:
+        #     work_location = Location.query.filter(Location.loc_id == work.loc_id).first()
+        #     street = Street.query.filter(Street.street_id == work_location.street_id).first()
+        #     work_street = street.street_name
+        #     work_address = work.address
+        #     work_cleanings = Cleaning.query.filter(Cleaning.loc_id==work.loc_id).all()
+        #     work_next_cleaning = return_next_cleaning(work_cleanings)[1]
+        #     work = [work_address, work_street, work_next_cleaning]
+        # recent = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='las').first()
+        # if recent:
+        #     recent_location = Location.query.filter(Location.loc_id==recent.loc_id).first()
+        #     street = Street.query.filter(Street.street_id == recent_location.street_id).first()
+        #     recent_street = street.street_name
+        #     recent_address = recent.address
+        #     recent_cleanings = Cleaning.query.filter(Cleaning.loc_id==recent.loc_id).all()
+        #     recent_next_cleaning = return_next_cleaning(recent_cleanings)[1]
+        #     recent = [recent_address, recent_street, recent_next_cleaning]
 
         streets = Street.query.order_by(Street.street_name.asc()).all()
         sides = Side.query.all()
 
         return render_template('/myplaces.html', 
-                               recent=recent, 
-                               work=work, 
-                               home=home, 
+                               all_places=all_places, 
                                streets=streets, 
                                sides=sides)
     else:

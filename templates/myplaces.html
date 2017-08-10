@@ -25,15 +25,23 @@
 
 
 <div class="container block">
+
     <div class="row">
-        <div id= "home" class="col-xs-12 col-sm-4">
-            {% if home %}
-                <div class="panel panel-success" id="homepanel" style="vertical-align: middle;">
-                    <div class="panel-heading">Home Address</div>
-                    <div id="homediv" class="panel-body"><h4>{{ home[0] }} {{ home[1] }}</h4><br>
-                    <b>Next Cleaning: </b>{{ home[2] }}</div>
+        {% for place in all_places%}
+        <div id= {{ place[3] }} class="col-xs-12 col-sm-4">
+                <div class="panel panel-success" id="{{ place[3] }}panel" style="vertical-align: middle;">
+                    <div class="panel-heading">{{ place[3] }} Address</div>
+                    <div id="homediv" class="panel-body"><h4>{{ place[0] }} {{ place[1] }}</h4><br>
+                    <b>Next Cleaning: </b>{{ place[2] }}</div>
                 </div>
-            {% endif %}
+            
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2>Update Your Places:</h2>
+    <div class="row">
+        <div class ='col-xs-12 col-sm-4'>
             <button class="btn btn-default" id="homebtn">Update Home Address</button>
             <form action='/add_fave_loc' id="homeform" class="hidden">
                 <div class="form-group">
@@ -66,14 +74,7 @@
                 <button type="submit" class="btn btn-default" >Update Recent Address</button>
             </form>
         </div>
-        <div id= "work" class="col-xs-12 col-sm-4">
-            {% if work %}
-                <div class="panel panel-success" id="workpanel" style="vertical-align: middle;">
-                    <div class="panel-heading">Work Address</div>
-                    <div id="workdiv" class="panel-body"><h4>{{ work[0] }} {{ work[1] }}</h4><br>
-                <b>Next Cleaning: </b>{{ work[2] }}</div>
-                </div>
-            {% endif %}
+        <div class ='col-xs-12 col-sm-4'>
             <button class="btn btn-default" id="workbtn">Update Work Address</button>
             <form action='/add_fave_loc' id="workform" class="hidden">
                 <div class="form-group">
@@ -106,14 +107,8 @@
                 <button type="submit" class="btn btn-default" >Update Work Address</button>
             </form>
         </div>
-        <div id="recent" class="col-xs-12 col-sm-4">
-            {% if recent %}
-                <div class="panel panel-success" id="recentpanel" style="vertical-align: middle;">
-                    <div class="panel-heading">Last Place You Parked</div>
-                    <div id="recentdiv" class="panel-body"><h4>{{ recent[0] }} {{ recent[1] }}</h4><br><b>Next Cleaning:</b> {{ recent[2] }}</div>
-                </div>
-            {% endif %}
-            <button class="btn btn-default" id="recentbtn">Update Recent Address</button>
+        <div class ='col-xs-12 col-sm-4'>
+             <button class="btn btn-default" id="recentbtn">Update Recent Address</button>
              <form action='/add_fave_loc' id="recentform" class="hidden">
                 <div class="form-group">
                     <label for="address">Address</label>
@@ -146,6 +141,26 @@
             </form>
         </div>
     </div>
+       <!--  <div id= "work" class="col-xs-12 col-sm-4">
+            {% if work %}
+                <div class="panel panel-success" id="workpanel" style="vertical-align: middle;">
+                    <div class="panel-heading">Work Address</div>
+                    <div id="workdiv" class="panel-body"><h4>{{ work[0] }} {{ work[1] }}</h4><br>
+                <b>Next Cleaning: </b>{{ work[2] }}</div>
+                </div>
+            {% endif %}
+            
+        </div>
+        <div id="recent" class="col-xs-12 col-sm-4">
+            {% if recent %}
+                <div class="panel panel-success" id="recentpanel" style="vertical-align: middle;">
+                    <div class="panel-heading">Last Place You Parked</div>
+                    <div id="recentdiv" class="panel-body"><h4>{{ recent[0] }} {{ recent[1] }}</h4><br><b>Next Cleaning:</b> {{ recent[2] }}</div>
+                </div>
+            {% endif %}
+           
+        </div>
+    </div> -->
   </div>
 
 
