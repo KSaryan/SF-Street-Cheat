@@ -34,9 +34,9 @@ def create_types():
 
     Type.query.delete()
 
-    hom = Type(type_id="hom", type_name="home")
-    wor = Type(type_id="wor", type_name="work")
-    las = Type(type_id="las", type_name="last")
+    hom = Type(type_id="hom", type_name="Home")
+    wor = Type(type_id="wor", type_name="Work")
+    las = Type(type_id="las", type_name="Recent")
 
     db.session.add_all([hom, wor, las])
     db.session.commit()

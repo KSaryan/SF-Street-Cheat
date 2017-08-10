@@ -1,6 +1,6 @@
-$('#recentbtn').on('click', function(){$('#recentform').removeClass();$('#recentbtn').addClass('hidden');})
-$('#workbtn').on('click', function(){$('#workform').removeClass();$('#workbtn').addClass('hidden');})
-$('#homebtn').on('click', function(){$('#homeform').removeClass();$('#homebtn').addClass('hidden');})
+$('#Recentbtn').on('click', function(){$('#Recentform').removeClass();$('#Recentbtn').addClass('hidden');})
+$('#Workbtn').on('click', function(){$('#Workform').removeClass();$('#Workbtn').addClass('hidden');})
+$('#Homebtn').on('click', function(){$('#Homeform').removeClass();$('#Homebtn').addClass('hidden');})
 
 
 function findingSides(result, sideDiv, aClass){
@@ -23,11 +23,11 @@ function streetSide(sideDiv, address, street, aClass){
     $.get('/find_sides.json', addressInputs, function(result){findingSides(result, sideDiv, aClass);}); 
 }
 
-$('#homeaddress').change(function(){streetSide('#homesidediv', '#homeaddress', '#homestreet', '.home');});
-$('#homestreet').change(function(){streetSide('#homesidediv', '#homeaddress', '#homestreet', '.home');});
+$('#Homeaddress').change(function(){streetSide('#Homesidediv', '#Homeaddress', '#Homestreet', '.Home');});
+$('#Homestreet').change(function(){streetSide('#Homesidediv', '#Homeaddress', '#Homestreet', '.Home');});
 
-$('#workaddress').change(function(){streetSide('#worksidediv', '#workaddress', '#workstreet', '.work');});
-$('#workstreet').change(function(){streetSide('#worksidediv', '#workaddress', '#workstreet', '.work');});
+$('#Workaddress').change(function(){streetSide('#Worksidediv', '#Workaddress', '#Workstreet', '.Work');});
+$('#Workstreet').change(function(){streetSide('#Worksidediv', '#Workaddress', '#Workstreet', '.Work');});
 
-$('#recentaddress').change(function(){streetSide('#recentsidediv', '#recentaddress', '#recentstreet', '.recent');});
-$('#recentstreet').change(function(){streetSide('#recentsidediv', '#recentaddress', '#recentstreet', '.recent');});
+$('#Recentaddress').change(function(){streetSide('#Recentsidediv', '#Recentaddress', '#Recentstreet', '.Recent');});
+$('#Recentstreet').change(function(){streetSide('#Recentsidediv', '#Recentaddress', '#Recentstreet', '.Recent');});

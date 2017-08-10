@@ -4,7 +4,7 @@ from flask import (Flask, render_template, redirect, request, flash,
                    session, url_for)
 # from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import update
-from model import (Location, Cleaning, Day, User, Side, 
+from model import (Location, Cleaning, Day, User, Side, Type,
                    Street, FaveLocation, MessageToSend, 
                    Towing, Tow_Location, Tow_Side, connect_to_db, db)
 import json
@@ -328,24 +328,7 @@ def my_places():
             place_next_cleaning = return_next_cleaning(place_cleanings)[1]
             place = [place_address, place_street, place_next_cleaning, typed]
             all_places.append(place)
-        # work = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='wor').first()
-        # if work:
-        #     work_location = Location.query.filter(Location.loc_id == work.loc_id).first()
-        #     street = Street.query.filter(Street.street_id == work_location.street_id).first()
-        #     work_street = street.street_name
-        #     work_address = work.address
-        #     work_cleanings = Cleaning.query.filter(Cleaning.loc_id==work.loc_id).all()
-        #     work_next_cleaning = return_next_cleaning(work_cleanings)[1]
-        #     work = [work_address, work_street, work_next_cleaning]
-        # recent = FaveLocation.query.filter(FaveLocation.user_id==session['login'], FaveLocation.type_id=='las').first()
-        # if recent:
-        #     recent_location = Location.query.filter(Location.loc_id==recent.loc_id).first()
-        #     street = Street.query.filter(Street.street_id == recent_location.street_id).first()
-        #     recent_street = street.street_name
-        #     recent_address = recent.address
-        #     recent_cleanings = Cleaning.query.filter(Cleaning.loc_id==recent.loc_id).all()
-        #     recent_next_cleaning = return_next_cleaning(recent_cleanings)[1]
-        #     recent = [recent_address, recent_street, recent_next_cleaning]
+        fave_places = db.session.query(Type).all()
 
         streets = Street.query.order_by(Street.street_name.asc()).all()
         sides = Side.query.all()
@@ -353,7 +336,8 @@ def my_places():
         return render_template('/myplaces.html', 
                                all_places=all_places, 
                                streets=streets, 
-                               sides=sides)
+                               sides=sides,
+                               fave_places=fave_places)
     else:
         flash("Please login to use")
         return redirect('/login')

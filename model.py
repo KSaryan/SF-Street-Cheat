@@ -161,7 +161,7 @@ class Type(db.Model):
     __tablename__ = "types"
 
     type_id = db.Column(db.String(3), primary_key=True)
-    type_name = db.Column (db.String(4), nullable=False)
+    type_name = db.Column (db.String(10), nullable=False)
 
     def __repr__ (self):
         """Displayed when called"""
