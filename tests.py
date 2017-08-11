@@ -39,13 +39,13 @@ class MyAppUnitTestCase(TestCase):
     def test_find_todays_cleaning(self):
         """tests find_todays_cleaning function in helpers"""
 
-        self.assertIn("now", (helpers.find_todays_cleaning(self.cleanings, self.now))[0])
+        self.assertIn("now", (helpers.find_todays_cleaning(self.cleanings, self.now))['info'])
 
 
     def test_find_next_cleaning(self):
         """tests find_next_cleaning in helpers"""
 
-        self.assertIn("Friday", (helpers.find_next_cleaning(self.cleanings, self.now))[1])
+        self.assertIn("Friday", (helpers.find_next_cleaning(self.cleanings, self.now))['message'])
         
    
     def test_find_location(self):
@@ -54,8 +54,8 @@ class MyAppUnitTestCase(TestCase):
         self.assertEqual(str(helpers.find_location(50, 'California st', 'North')), '<rt: 0-100, lt: 1-1001 for loc: 1>')
 
 
-class TestRoutesLogedIn(TestCase):
-    """Tests routes as user loged in"""
+class TestRoutesLoggedIn(TestCase):
+    """Tests routes as user logged in"""
 
     def setUp(self):
         """Do at beginning of every test"""
@@ -67,7 +67,7 @@ class TestRoutesLogedIn(TestCase):
         example_data()
         with self.client as c:
           with c.session_transaction() as sess:
-              sess['login'] = 1
+              sess['user_id'] = 1
 
     def tearDown(self):
         """Do at end of every test."""
@@ -76,32 +76,32 @@ class TestRoutesLogedIn(TestCase):
         db.session.close()
         
 
-    def test_homepage_loged_in(self):
+    def test_homepage_logged_in(self):
         """tests index route as a get request"""
 
         result = self.client.get('/', follow_redirects=True)
         self.assertIn("Confirm Your Location", result.data)
 
-    def test_login_loged_in(self):
+    def test_login_logged_in(self):
         """tests login route"""
 
         result = self.client.get('/login', follow_redirects=True)
         self.assertIn("Confirm Your Location", result.data)
 
-    def test_parking_loged_in(self):
+    def test_parking_logged_in(self):
         """tests parking route"""
 
         result = self.client.get('/parking')
         self.assertIn("Confirm Your Location", result.data)
         self.assertIn("Get A Text Reminder", result.data)
 
-    def test_my_places_loged_in(self):
+    def test_my_places_logged_in(self):
         """test my_places route"""
 
         result = self.client.get('/my_places')
         self.assertIn("Recent", result.data)
 
-    def test_user_info_loged_in(self):
+    def test_user_info_logged_in(self):
         """tests user_info route"""
 
         result = self.client.get('/user_info')
@@ -127,8 +127,8 @@ class TestRoutesLogedIn(TestCase):
         self.assertIn('50 California st', result.data)
 
 
-class TestRoutesLogedOut(TestCase):
-    """Tests routes as user loged out"""
+class TestRoutesLoggedOut(TestCase):
+    """Tests routes as user logged out"""
 
     def setUp(self):
         """Do at beginning of every test"""
@@ -145,21 +145,21 @@ class TestRoutesLogedOut(TestCase):
         db.drop_all()
         db.session.close()
 
-    def test_parking_loged_out(self):
+    def test_parking_logged_out(self):
         """tests parking route"""
 
         result = self.client.get('/parking', follow_redirects=True)
         self.assertIn("login", result.data)
         self.assertIn("Login to Get Text Reminders", result.data)
 
-    def test_my_places_loged_out(self):
+    def test_my_places_logged_out(self):
         """tests my_places route"""
 
         result = self.client.get('/my_places', follow_redirects=True)
         self.assertNotIn("Recent", result.data)
-        self.assertIn("Please login to use", result.data)
+        self.assertIn("Log in to access", result.data)
 
-    def test_user_info_loged_out(self):
+    def test_user_info_logged_out(self):
         """tests user_info route"""
 
         result = self.client.get('/user_info', follow_redirects=True)
@@ -198,7 +198,7 @@ class TestRoutesLogedOut(TestCase):
         self.assertIn("Invalid number. Make sure to include area code.", result.data)
 
 class TestRoutesWithMoc(TestCase):
-    """Tests routes with user loged in and mock function for time"""
+    """Tests routes with user logged in and mock function for time"""
 
     def setUp(self):
         """Do at beginning of every test"""
@@ -214,7 +214,7 @@ class TestRoutesWithMoc(TestCase):
         helpers.get_datetime = _mock_date_time
         with self.client as c:
             with c.session_transaction() as sess:
-                sess['login'] = 1
+                sess['user_id'] = 1
 
     def tearDown(self):
         """Do at end of every test."""
@@ -244,6 +244,14 @@ class TestRoutesWithMoc(TestCase):
                                  query_string={'address':'5002', 'street':'Sacramento st', 'side':'South'})
         self.assertIn('Street cleaning is now', result.data)
 
+    def test_street_cleaning_no_side(self):
+        """tests street_cleaning route"""
+
+        result = self.client.get('/street_cleaning.json',
+                                 query_string={'address':'50', 'street':'Lake st'})
+        self.assertIn('Monday', result.data)
+
+
     def test_street_cleaning_wrong_address(self):
         """tests street_cleaning route"""
 
@@ -271,7 +279,7 @@ class TestUser1Text(TestCase):
         example_data()
         with self.client as c:
             with c.session_transaction() as sess:
-                sess['login'] = 1
+                sess['user_id'] = 1
 
     def tearDown(self):
         """Do at end of every test."""
@@ -298,7 +306,7 @@ class TestUser2Text(TestCase):
         example_data()
         with self.client as c:
             with c.session_transaction() as sess:
-                sess['login'] = 2
+                sess['user_id'] = 2
 
     def tearDown(self):
         """Do at end of every test."""

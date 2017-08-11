@@ -251,7 +251,7 @@ def example_data():
     user2 = User(email = "kristine", password = hashed, phone='8183333333')
     street = Street(street_id = 1, street_name = "California st")
     street2 = Street(street_id = 2, street_name = "Sacramento st")
-    street3 = Street(street_id = 3, street_name = "Lake")
+    street3 = Street(street_id = 3, street_name = "Lake st")
     side = Side(side_id = 1, side_name = "North")
     side2 = Side(side_id = 2, side_name = "South")
     location = Location (loc_id = 1, street_id = 1, 
@@ -306,17 +306,22 @@ def example_data():
                         end_time = '13:00',
                         week_of_mon = 3,
                         day_id = 'Mon')
+    cleaning6 = Cleaning(loc_id = 4,
+                        start_time = '8:00',
+                        end_time = '13:00',
+                        week_of_mon = 3,
+                        day_id = 'Mon')
 
     day = Day(day_id = 'Thu', day_name = 'Thursday', day_short="Th")
     day2 = Day(day_id = 'Fri', day_name ='Friday', day_short="Fr")
     day3 = Day(day_id = 'Mon', day_name ='Monday', day_short="Mo")
-    type1 = Type(type_id="hom", type_name="home")
-    type2 = Type(type_id="wor", type_name="work")
-    type3 = Type(type_id="las", type_name="last")
+    type1 = Type(type_id="hom", type_name="Home")
+    type2 = Type(type_id="wor", type_name="Work")
+    type3 = Type(type_id="las", type_name="Recent")
     db.session.add_all([day, day2, cleaning, cleaning2, 
                         location, location2, side, street, 
                         user, street2, side2, location3,
-                        cleaning3, user2, street3, location4,
+                        cleaning3, user2, street3, location4, cleaning6,
                         type2, type3, type1, cleaning4, cleaning5, day3])
     db.session.commit()
 

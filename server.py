@@ -1,7 +1,7 @@
 from jinja2 import StrictUndefined
 from flask import jsonify
 from flask import (Flask, render_template, redirect, request, flash,
-                   session, url_for)
+                   session, url_for, g)
 # from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import update
 from model import (Location, Cleaning, Day, User, Side, Type,
@@ -19,27 +19,53 @@ from helpers import *
 from math import radians, cos, sin, asin, sqrt
 from operator import itemgetter
 from decimal import Decimal
+from functools import wraps
 
 
 
 app = Flask(__name__)
 app.secret_key = "ABC"
 
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.current_user is None:
+            flash("Log in to access")
+            return redirect('/')
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.before_request
+def pre_process_all_requests():
+    """Setup the request context"""
+
+    user_id = session.get('user_id')
+    if user_id:
+        g.current_user = User.query.get(user_id)
+        g.logged_in = True
+        g.email = g.current_user.email
+        g.user_id = g.current_user.user_id
+        g.phone = g.current_user.phone
+    else:
+        g.logged_in = False
+        g.current_user = None
+        g.email = None
+
 @app.route('/')
 def homepage():
     """Displays homepage with login form"""
-    
-    if 'login' in session:
+    if g.logged_in:
         return redirect ('/parking')
-    else:
-        return render_template('homepage.html')
+    return render_template('homepage.html')
 
 
 @app.route('/logout')
 def log_out():
     """logs out user"""
 
-    del session['login']
+    del session['user_id']
 
     return redirect ('/')
 
@@ -48,10 +74,9 @@ def log_out():
 def log_in():
     """Displays login page"""
 
-    if 'login' in session:
+    if g.logged_in:
         return redirect('/parking')
-    else:
-        return render_template('login.html')
+    return render_template('login.html')
 
 
 @app.route('/verify_user', methods=["POST"])
@@ -62,16 +87,18 @@ def verify_user():
     email = request.form.get("email")
     email = email.lower()
     q = db.session.query(User).filter(User.email==email).first()
-    if q:
-        password = password.encode('utf8') 
-        hashedpass = q.password.encode('utf8') 
-        if bcrypt.checkpw(password, hashedpass):
-            session['login'] = q.user_id
-            return redirect('/parking')
-        else:
-            flash("Username or password not found")
-            return redirect ('/')
 
+    if not q:
+        flash("Username or password not found")
+        return redirect ('/')
+
+  
+    password = password.encode('utf8') 
+    hashedpass = q.password.encode('utf8') 
+    
+    if bcrypt.checkpw(password, hashedpass):
+        session['user_id'] = q.user_id
+        return redirect('/parking')
     else:
         flash("Username or password not found")
         return redirect ('/')
@@ -100,20 +127,15 @@ def create_user():
     user = User(password=hashed, email=email, phone=phone)
     db.session.add(user)
     db.session.commit()
-    session['login']= user.user_id
+    session['user_id']= user.user_id
     return redirect('/parking')
 
 
 @app.route('/user_info')
+@login_required
 def display_user_information():
     """displays user information"""
-
-    if 'login' in session:
-        user = User.query.get(session['login'])
-        return render_template('user_info.html', user=user)
-    else:
-        flash("Please login in to view")
-        return redirect ('/')
+    return render_template('user_info.html', user=g.current_user)
 
 
 @app.route('/update_user', methods=["POST"])
@@ -123,27 +145,25 @@ def update_user_info():
     email = request.form.get("email")
     password = request.form.get("password")
     number = request.form.get("number")
-    user = User.query.get(session['login'])
-    if email:
-        if len(email) > 30:
-            flash('Password or email too long')
-        else:
-            email = email.lower()
-            user.email = email.rstrip()
-            password = password.rstrip()
-            password = password.encode('utf8') 
-            hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-            user.password = hashed
-            flash('Information Updated')
-            
-    
+    user = User.query.get(g.user_id)
     if number:
         number=re.sub(r"[\-\(\)\.\s]+", "", number)
-        if len(number) != 10:
-            flash("Invalid number. Make sure to include area code.")
-        else:
-            user.phone = number.rstrip()
-            flash('Information Updated')
+
+    if len(email) > 30:
+        flash('Password or email too long')
+
+    elif len(number) != 10:
+        flash("Invalid number. Make sure to include area code.")
+
+    else:
+        email = email.lower()
+        user.email = email.rstrip()
+        password = password.rstrip()
+        password = password.encode('utf8') 
+        hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+        user.password = hashed
+        user.phone = number.rstrip()
+        flash('Information Updated')
         
     
     db.session.add(user)
@@ -158,12 +178,7 @@ def parking():
 
     streets = Street.query.order_by(Street.street_name.asc()).all()
     sides = Side.query.all()
-    if 'login' in session:
-        user = User.query.get(session['login']) 
-        email = user.email
-    else:
-        email = None
-    return render_template('parking.html', streets=streets, sides=sides, email=email)
+    return render_template('parking.html', streets=streets, sides=sides)
 
 
 @app.route('/street_cleaning.json')
@@ -172,7 +187,7 @@ def street_cleaning():
 
     address = request.args.get("address")
     address = int(address)
-    street = (request.args.get("street")).replace("-", " ")
+    street = clean_street(request.args.get("street"))
     side = request.args.get("side")
     geolocation = find_geolocation(address, street)
 
@@ -180,40 +195,13 @@ def street_cleaning():
     towings = get_towings(towing_locs)
     towing_message = get_towing_message(towings)
 
-    if side == " " or side == None:
-        location = find_location(address, street)
-    else:
-        location = find_location(address,street, side)
-    if location:
-        if 'login' in session:
-            add_fave_location(session['login'], location.loc_id, 'las', address)
+    
+    location = find_location(address,street, side)
+    
+    if location and g.logged_in:
+        add_fave_location(g.user_id, location.loc_id, 'las', address)
 
-
-        street_cleanings = Cleaning.query.filter(Cleaning.loc_id==location.loc_id).all()
-
-        holiday = check_for_holidays(street_cleanings)
-
-        if holiday is None:
-            holiday = ""
-
-        next_cleaning = return_next_cleaning(street_cleanings)
-        if next_cleaning[0] == "now":
-            result = {"info_message": next_cleaning[0], 
-                      "message": next_cleaning[1] + "/n" + holiday,
-                      "geolocation": geolocation,
-                      "towing": towing_message}
-
-        else:
-            result = {"info_message": next_cleaning[0], 
-                      "message": next_cleaning[1] + "\n" + holiday,
-                      "cleaning_time":next_cleaning[2],
-                      "geolocation": geolocation,
-                      "towing": towing_message}
-    else:
-        message = "Not a valid address or no street cleaning in area (Russian Hill)"
-        result = {"info_messge": "not a valid address",
-                  "message": message,
-                  "geolocation": geolocation}
+    result = prep_result(location, geolocation, towing_message)
 
 
     return jsonify(result)
@@ -246,34 +234,40 @@ def find_sides():
     """returns sides of street associated with an address"""
 
     address = request.args.get("address")
-    street = request.args.get("street")
-    street = street.replace("-", " ")
+    street = clean_street(request.args.get("street"))
+
     sides = get_sides_for_this_location(street, address)
+    
     if sides:
         sides_json = {'sides': sides
                      }
         return jsonify(sides_json)
-    else:
-        return "no sides"
+ 
+    return "no sides"
 
 
 @app.route('/send_text.json', methods=["POST"])
+@login_required
 def send_text():
     """Creates a new message in the MessagesToSend table"""
+    
+    phone = g.current_user.phone
 
-    user = User.query.get(session["login"])
-    if user.phone:
-        time = request.form.get("cleaningtime")
-        message = MessageToSend(user_id=session['login'], time= time)
-        db.session.add(message)
-        db.session.commit()
-        result = {'info_message': 'True',
-                   'number': user.phone}
-        return jsonify(result)
-    else:
+    if not phone:
         flash("You must have a phone number to get texts")
         result = {'info_message': 'False'}
+
         return jsonify(result)
+  
+    time = request.form.get("cleaningtime")
+    message = MessageToSend(user_id=g.user_id, time=time)
+    db.session.add(message)
+    db.session.commit()
+    result = {'info_message': 'True',
+               'number': g.phone}
+
+    return jsonify(result)
+
 
 
 @app.route('/nearby_cleanings.json')
@@ -281,66 +275,64 @@ def find_nearby_cleanings():
     """returns nearby street cleanings with information needed for creating markers"""
 
     address = int(request.args.get("address"))
-    street = (request.args.get("street")).replace("-", " ")
+    street = clean_street(request.args.get("street"))
     side = request.args.get("side")
     closest_places = find_nearby_places(address, street, side)
     #replacing loc_id with message about when street cleaning is
     for place in closest_places:
-        loc_id = place[2]
+        loc_id = place['loc_id']
         street_cleanings = Cleaning.query.filter(Cleaning.loc_id==loc_id).all()
-        next_cleaning = return_next_cleaning(street_cleanings)
-        place[2]= next_cleaning[1]
+        next_cleaning = get_next_cleaning(street_cleanings)
+        place['message']= next_cleaning['message']
     #putting information in an organized dictionary
     results = {}
     for i in range (len(closest_places)):
         item = closest_places[i]
-        message = "Try parking on %s. %s" %(item[3], item[2])
-        results[str(i)] = {"km": item[0], "coordinates": item[1], "message": message, "num": i}
+        message = "Try parking on %s. %s" %(item['street'], item['message'])
+        results[str(i)] = {"km": item['km'], "coordinates": item['lat-lng'], "message": message, "num": i}
     return jsonify(results)
 
 
 @app.route('/add_fave_loc')
 def add_a_fave():
-    street = request.args.get('street').replace("-", " ")
+    street = clean_street(request.args.get("street"))
     address = int(request.args.get('address'))
     side = request.args.get('side')
     typefave = request.args.get ('type')
-    if side == " " or side == None:
-        location = find_location(address, street)
-    else:
-        location = find_location(address,street, side)
-    add_fave_location(session['login'], location.loc_id, typefave, address)
+   
+    location = find_location(address,street, side)
+
+    add_fave_location(g.user_id, location.loc_id, typefave, address)
     return redirect('/my_places')
 
 
 @app.route('/my_places')
+@login_required
 def my_places():
-    if 'login' in session:
-        all_places =[]
-        places = db.session.query(FaveLocation).filter(FaveLocation.user_id==session['login']).all()
-        for place in places:
-            typed = place.typed.type_name
-            place_location = Location.query.filter(Location.loc_id ==place.loc_id).first()
-            street = Street.query.filter(Street.street_id == place_location.street_id).first()
-            place_street = street.street_name
-            place_address = place.address
-            place_cleanings = Cleaning.query.filter(Cleaning.loc_id==place.loc_id).all()
-            place_next_cleaning = return_next_cleaning(place_cleanings)[1]
-            place = [place_address, place_street, place_next_cleaning, typed]
-            all_places.append(place)
-        fave_places = db.session.query(Type).all()
+    """Displays users saved places"""
 
-        streets = Street.query.order_by(Street.street_name.asc()).all()
-        sides = Side.query.all()
+    all_places =[]
+    places = db.session.query(FaveLocation).filter(FaveLocation.user_id==g.user_id).all()
+    for place in places:
+        typed = place.typed.type_name
+        place_location = Location.query.filter(Location.loc_id ==place.loc_id).first()
+        street = Street.query.filter(Street.street_id == place_location.street_id).first()
+        place_street = street.street_name
+        place_address = place.address
+        place_cleanings = Cleaning.query.filter(Cleaning.loc_id==place.loc_id).all()
+        place_next_cleaning = get_next_cleaning(place_cleanings)['message']
+        place = [place_address, place_street, place_next_cleaning, typed]
+        all_places.append(place)
 
-        return render_template('/myplaces.html', 
-                               all_places=all_places, 
-                               streets=streets, 
-                               sides=sides,
-                               fave_places=fave_places)
-    else:
-        flash("Please login to use")
-        return redirect('/login')
+    fave_places = db.session.query(Type).all()
+    streets = Street.query.order_by(Street.street_name.asc()).all()
+    sides = Side.query.all()
+
+    return render_template('/myplaces.html', 
+                           all_places=all_places, 
+                           streets=streets, 
+                           sides=sides,
+                           fave_places=fave_places)
 
 
 # @app.route('/heatmap')
@@ -366,9 +358,8 @@ def my_places():
 @app.route('/geo_for_map')
 def get_geo_for_map():
     address = request.args.get("address")
-    street = request.args.get("street").replace("-", " ")
+    street = clean_street(request.args.get("street"))
     geo = find_geolocation(address, street)
-    print geo
     return jsonify(geo)
   
 if __name__ == "__main__":

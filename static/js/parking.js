@@ -27,7 +27,6 @@ $('#locationsbtn').on('click', changeView3);
 
 
 function changeMarkers(num){
-    console.log("Here");
     for (var i = 0; i<allMarkers.length; i++){
         if (allMarkers[i].num == num){
             allMarkers[i].setIcon('/static/img/green_MarkerP.png');

@@ -7,6 +7,9 @@ import requests
 from math import radians, cos, sin, asin, sqrt
 from operator import itemgetter
 
+def clean_street(street):
+  return street.replace("-", " ")
+
 def get_datetime():
   """returns current datetime"""
 
@@ -103,7 +106,7 @@ def find_next_cleaning(street_cleanings, now):
                 year = str(today.year)
                 cleaning_time_string = month + "-" + date + "-" + year +" " + cleaning.start_time
                 cleaning_time = datetime.strptime(cleaning_time_string, '%B-%d-%Y %H:%M')
-                return ["another day", message, cleaning_time]
+                return {'info':"another day", 'message': message, 'cleaning_time': cleaning_time}
 
 
 def find_todays_cleaning(street_cleanings, now):
@@ -122,13 +125,13 @@ def find_todays_cleaning(street_cleanings, now):
                     hours = int(start_time.strftime("%H")) - int(now.strftime("%H"))
                     cleaning_time = get_datetime() + timedelta(hours=hours)
                     message = "Street cleaning is today. It's in %s hours." %(str(hours))
-                    return ["today", message, cleaning_time]
+                    return {'info':"today", 'message':message, 'cleaning_time':cleaning_time}
                 elif int(start_time.strftime("%H")) <= int(now.strftime("%H")):
-                    return ["now", "Street cleaning is now"]
+                    return {'info': "now", 'message': "Street cleaning is now"}
   return False
 
 
-def return_next_cleaning(street_cleanings):
+def get_next_cleaning(street_cleanings):
     """Returns date of next cleaning"""
     
     now = get_datetime()
@@ -162,12 +165,10 @@ def find_location(number, street, side = None):
     """returns unique location from locations table"""
 
     street1 = Street.query.filter(Street.street_name == street).first()
-
-    if side:
-      side1 = Side.query.filter(Side.side_name==side).first()
-      side_id = side1.side_id
-    else:
-      side_id =None
+    try:
+      side_id = Side.query.filter(Side.side_name==side).first().side_id
+    except:
+      side_id = None
 
     if number % 2 == 0:
         location = Location.query.filter(Location.side_id==side_id,
@@ -224,6 +225,8 @@ def find_nearby_places(address, street, side):
       overall_distances.append(best_distance)
   overall_distances = sorted(overall_distances, key=itemgetter(0))
   closest_places = overall_distances[:25]
+  closest_places = [{'km': x[0], 'lat-lng': x[1], 'loc_id': x[2], 'street': x[3]} for x in closest_places]
+  print closest_places
   return closest_places
 
 
@@ -239,5 +242,35 @@ def add_fave_location(user_id, loc_id, type_id, address):
   
   db.session.add(fl)
   db.session.commit()
+
+def prep_result(location, geolocation, towing_message):
+  if location:
+    street_cleanings = Cleaning.query.filter(Cleaning.loc_id==location.loc_id).all()
+
+    holiday = check_for_holidays(street_cleanings)
+
+    if holiday is None:
+        holiday = ""
+
+    next_cleaning = get_next_cleaning(street_cleanings)
+    if next_cleaning['info'] == "now":
+        result = {"info_message": next_cleaning['info'], 
+                  "message": next_cleaning['message'] + "/n" + holiday,
+                  "geolocation": geolocation,
+                  "towing": towing_message}
+
+    else:
+        result = {"info_message": next_cleaning['info'], 
+                  "message": next_cleaning['message'] + "\n" + holiday,
+                  "cleaning_time":next_cleaning['cleaning_time'],
+                  "geolocation": geolocation,
+                  "towing": towing_message}
+  else:
+    message = "Not a valid address or no street cleaning in area (Russian Hill)"
+    result = {"info_messge": "not a valid address",
+              "message": message,
+              "geolocation": geolocation}
+
+  return result
 
 
