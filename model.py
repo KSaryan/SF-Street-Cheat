@@ -14,6 +14,10 @@ class Street(db.Model):
     street_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     street_name = db.Column(db.String(20), nullable=False)
 
+    @staticmethod
+    def clean_street(name):
+        return name.replace("-", " ")
+
     def __repr__ (self):
         """Displayed when called"""
 
@@ -75,6 +79,15 @@ class Location(db.Model):
                                                         self.lt_from_address,
                                                         self.lt_to_address,
                                                         self.loc_id)
+
+    def check_for_holidays(self):
+        """Checks for holiday hours at location"""
+
+        for cleaning in  self.cleanings:
+            if cleaning.day_id == 'Hol':
+                return "There are holiday hours associated with this location. They are %s - %s (military time.)" %(cleaning.start_time, cleaning.end_time)
+
+        return ""
 
 
 class Cleaning(db.Model):
@@ -154,6 +167,21 @@ class FaveLocation(db.Model):
         return "<fl-id: %s, user-id: %s, loc-id: %s>"%(self.fl_id, 
                                                        self.user_id, 
                                                        self.loc_id)
+    
+    @classmethod
+    def add_fave_location(cls, user_id, loc_id, type_id, address):
+        """adds new saved favorite location for user or updates existing"""
+          
+        fl = cls.query.filter(cls.user_id==user_id, cls.type_id==type_id).first()
+        if fl:
+            fl.loc_id = loc_id
+            fl.address = address
+        else:
+            fl = cls(user_id=user_id, loc_id=loc_id, type_id=type_id, address=address)
+          
+        db.session.add(fl)
+        db.session.commit()
+
 
 class Type(db.Model):
     """Types of favorite places"""
@@ -228,6 +256,44 @@ class Towing(db.Model):
         """Displayed when called"""
 
         return "< towing for loc-id: %s>"%(self.tow_loc_id)
+
+    @staticmethod
+    def get_towings(towing_locs, now):
+        """Finds next two towing times"""
+
+        day = now.strftime("%a")
+        tomorrow = now + timedelta(days=1)
+        tomorrow_day = tomorrow.strftime("%a")
+
+        towings_list = []
+        
+        for loc in towing_locs:
+            towings_list.extend(loc.towings)
+
+        next_towings = []
+        for towing in towings_list:
+            if towing.day_id == day or towing.day_id == tomorrow_day:
+                next_towings.append(towing)
+
+        return next_towings [:2]
+
+    @staticmethod
+    def get_towing_message(towings):
+        """Creates message about towing"""
+
+        t_messages = ""
+
+        if not towings:
+            return t_messages
+
+        for t in towings:
+            t_side = t.tow_location.tow_side.tow_side_name
+            t_side = (t_side.rstrip(" Sides")).lower()
+            t_message = "There is towing on the %s side(s) of this street on %s, at %s. "%(t_side, t.day.day_name, t.start_time)
+            t_messages += t_message
+
+        return t_messages
+
 
 class Tow_Side(db.Model):
     """sides for towing"""

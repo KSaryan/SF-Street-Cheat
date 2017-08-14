@@ -7,6 +7,11 @@ import os
 from twilio.rest import Client
 import sendgrid
 from sendgrid.helpers.mail import *
+import logging
+
+
+LOG_FILENAME = 'failed_messages.log'
+logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 
 connect_to_db(app)
 
@@ -29,7 +34,6 @@ def job():
                 body="Move your car by " + time + " (military time)")
                 #could make this dynamic
                 # status_callback='http://localhost:5000/twilio_callbacks')
-            print "Sending texts"
         except:
             try:
                 email = user.email
@@ -42,9 +46,8 @@ def job():
                                   time + ".\nAnd don't forget to update your account!")
                 mail = Mail(from_email, subject, to_email, content)
                 response = sg.client.mail.send.post(request_body=mail.get())
-                print "Sending email"
             except:
-                print "failed to send message to user " + str(m.user_id)
+                logging.warn("failed to send message to user " + str(m.user_id))
         db.session.delete(m)
         db.session.commit()
 

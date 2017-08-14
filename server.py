@@ -20,6 +20,7 @@ from math import radians, cos, sin, asin, sqrt
 from operator import itemgetter
 from decimal import Decimal
 from functools import wraps
+from place_class import Place
 
 
 
@@ -37,6 +38,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 @app.before_request
 def pre_process_all_requests():
     """Setup the request context"""
@@ -53,6 +55,7 @@ def pre_process_all_requests():
         g.current_user = None
         g.email = None
 
+
 @app.route('/')
 def homepage():
     """Displays homepage with login form"""
@@ -63,7 +66,7 @@ def homepage():
 
 @app.route('/logout')
 def log_out():
-    """logs out user"""
+    """Logs out user"""
 
     del session['user_id']
 
@@ -134,7 +137,7 @@ def create_user():
 @app.route('/user_info')
 @login_required
 def display_user_information():
-    """displays user information"""
+    """Displays user information"""
     return render_template('user_info.html', user=g.current_user)
 
 
@@ -184,22 +187,26 @@ def parking():
 @app.route('/street_cleaning.json')
 def street_cleaning():
     """Returns time until street cleaning"""
-
-    address = request.args.get("address")
-    address = int(address)
-    street = clean_street(request.args.get("street"))
+    address = int(request.args.get("address"))
+    street = Street.clean_street(request.args.get("street"))
     side = request.args.get("side")
-    geolocation = find_geolocation(address, street)
+    place = Place(address=address,
+                  street=street,
+                  side=side)
+    
+    geolocation = place.find_geolocation()
 
-    towing_locs = get_towing_locs(address, street)
-    towings = get_towings(towing_locs)
-    towing_message = get_towing_message(towings)
+    now = get_datetime()
+    
+    towing_locs = place.get_towing_locs()
+    towings = Towing.get_towings(towing_locs, now)
+    towing_message = Towing.get_towing_message(towings)
 
     
-    location = find_location(address,street, side)
+    location = place.find_location()
     
     if location and g.logged_in:
-        add_fave_location(g.user_id, location.loc_id, 'las', address)
+        FaveLocation.add_fave_location(g.user_id, location.loc_id, 'las', address)
 
     result = prep_result(location, geolocation, towing_message)
 
@@ -209,7 +216,7 @@ def street_cleaning():
 
 @app.route('/current_location.json')
 def get_current_location():
-    """use reverse geolocation to get nearest address"""
+    """Use reverse geolocation to get nearest address"""
 
     lat = request.args.get("lat")
     lng = request.args.get("lng")
@@ -220,7 +227,9 @@ def get_current_location():
         data = response.json()
         street = (data["results"][0]["address_components"][1]["short_name"]).upper()
         address= re.sub(r'\-\d+', "", data["results"][0]["address_components"][0]["long_name"])
-        sides = get_sides_for_this_location(street, address)
+        place = Place(address=int(address), 
+                      street=street)
+        sides = place.get_sides_for_this_location()
         street = street.replace(" ", "-")
         address_info = {'street': street,
                         'address': address,
@@ -231,12 +240,12 @@ def get_current_location():
 
 @app.route('/find_sides.json')
 def find_sides():
-    """returns sides of street associated with an address"""
+    """Returns sides of street associated with an address"""
 
-    address = request.args.get("address")
-    street = clean_street(request.args.get("street"))
+    place = Place(address = int(request.args.get("address")),
+                  street = Street.clean_street(request.args.get("street")))
 
-    sides = get_sides_for_this_location(street, address)
+    sides = place.get_sides_for_this_location()
     
     if sides:
         sides_json = {'sides': sides
@@ -275,9 +284,12 @@ def find_nearby_cleanings():
     """returns nearby street cleanings with information needed for creating markers"""
 
     address = int(request.args.get("address"))
-    street = clean_street(request.args.get("street"))
+    street = Street.clean_street(request.args.get("street"))
     side = request.args.get("side")
-    closest_places = find_nearby_places(address, street, side)
+    place = Place(street=street,
+                  address=address,
+                  side=side)
+    closest_places = place.find_nearby_places()
     #replacing loc_id with message about when street cleaning is
     for place in closest_places:
         loc_id = place['loc_id']
@@ -295,14 +307,21 @@ def find_nearby_cleanings():
 
 @app.route('/add_fave_loc')
 def add_a_fave():
-    street = clean_street(request.args.get("street"))
+    """Adds a new location to FaveLocation table"""
+    
+    street = Street.clean_street(request.args.get("street"))
     address = int(request.args.get('address'))
     side = request.args.get('side')
-    typefave = request.args.get ('type')
-   
-    location = find_location(address,street, side)
 
-    add_fave_location(g.user_id, location.loc_id, typefave, address)
+    place = Place(street=street,
+                  address=address,
+                  side=side)
+
+    typefave = request.args.get('type')
+   
+    location = place.find_location()
+
+    FaveLocation.add_fave_location(g.user_id, location.loc_id, typefave, address)
     return redirect('/my_places')
 
 
@@ -335,6 +354,8 @@ def my_places():
                            fave_places=fave_places)
 
 
+#for heatmap I decided not to use
+
 # @app.route('/heatmap')
 # def show_heat_map():
 #     return render_template('map.html')
@@ -355,12 +376,12 @@ def my_places():
 #     all_cleanings = {'all_geos': geos}
 #     return jsonify(all_cleanings)
 
-@app.route('/geo_for_map')
-def get_geo_for_map():
-    address = request.args.get("address")
-    street = clean_street(request.args.get("street"))
-    geo = find_geolocation(address, street)
-    return jsonify(geo)
+# @app.route('/geo_for_map')
+# def get_geo_for_map():
+#     place = Place(address = request.args.get("address"), 
+#                   street= Street.clean_street(request.args.get("street")))
+#     geo = place.find_geolocation()
+#     return jsonify(geo)
   
 if __name__ == "__main__":
 

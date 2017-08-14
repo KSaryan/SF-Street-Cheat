@@ -2,4 +2,4 @@ env/
 *.pyc
 secrets.sh
 removed.py
-
+*.DS_STORE
