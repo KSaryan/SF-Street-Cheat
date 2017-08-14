@@ -6,6 +6,7 @@ SF StreetCheat is a 4 week project that I completed during my time as a software
 * [Database Model](#database-model)
 * [Features](#features)
 * [Installation](#install)
+* [Testing](#testing)
 
 ## <a name="technologies"></a>Technologies
 <b>Backend:</b> Python, Flask, PostgreSQL, SQLAlchemy<br/>
@@ -45,7 +46,7 @@ Or check on favorite or recent locations
 ![alt text](screenshots/my-places.png "My Places")
 
 
-## <a name="features"></a>Installation
+## <a name="install"></a>Installation
 To run SF StreetCheat:
 
 Install PostgreSQL (Mac OSX)
@@ -101,3 +102,20 @@ python server.py
 ```
 
 You can now navigate to 'localhost:5000/' to access SF StreetCheat.
+
+
+<a name="testing"></a> Testing
+To run tests:
+
+Set up tests database:
+
+```
+createdb testdb
+```
+
+Run the tests:
+
+```
+python tests.py
+```
+
