@@ -104,7 +104,7 @@ python server.py
 You can now navigate to 'localhost:5000/' to access SF StreetCheat.
 
 
-##<a name="testing"></a> Testing
+## <a name="testing"></a> Testing
 To run tests:
 
 Set up tests database:
