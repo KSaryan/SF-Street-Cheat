@@ -2,10 +2,11 @@ from unittest import TestCase
 from model import (Location, Cleaning, Day, User, Side, 
                    Street, FaveLocation, MessageToSend, connect_to_db, db, example_data)
 from server import app
-from helpers import *
+import helpers
 from pytz import timezone
 from place_class import Place
 from datetime import datetime
+import server
 
 
 class MyAppUnitTestCase(TestCase):
@@ -36,13 +37,13 @@ class MyAppUnitTestCase(TestCase):
     def test_find_todays_cleaning(self):
         """tests find_todays_cleaning function in helpers"""
 
-        self.assertIn("now", (find_todays_cleaning(self.cleanings, self.now))['info'])
+        self.assertIn("now", (helpers.find_todays_cleaning(self.cleanings, self.now))['info'])
 
 
     def test_find_next_cleaning(self):
         """tests find_next_cleaning in helpers"""
 
-        self.assertIn("Friday", (find_next_cleaning(self.cleanings, self.now))['message'])
+        self.assertIn("Friday", (helpers.find_next_cleaning(self.cleanings, self.now))['message'])
         
    
 
@@ -204,7 +205,7 @@ class TestRoutesWithMoc(TestCase):
         def _mock_date_time():
             return datetime(2017, 5, 18, 18, 3, 3, 963267)
 
-        get_datetime = _mock_date_time
+        helpers.get_datetime = _mock_date_time
         with self.client as c:
             with c.session_transaction() as sess:
                 sess['user_id'] = 1
