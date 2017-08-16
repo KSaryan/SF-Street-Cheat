@@ -5,6 +5,8 @@ from server import app
 from helpers import *
 from pytz import timezone
 from place_class import Place
+from datetime import datetime
+
 
 class MyAppUnitTestCase(TestCase):
     """class for unittests"""
@@ -34,13 +36,13 @@ class MyAppUnitTestCase(TestCase):
     def test_find_todays_cleaning(self):
         """tests find_todays_cleaning function in helpers"""
 
-        self.assertIn("now", (helpers.find_todays_cleaning(self.cleanings, self.now))['info'])
+        self.assertIn("now", (find_todays_cleaning(self.cleanings, self.now))['info'])
 
 
     def test_find_next_cleaning(self):
         """tests find_next_cleaning in helpers"""
 
-        self.assertIn("Friday", (helpers.find_next_cleaning(self.cleanings, self.now))['message'])
+        self.assertIn("Friday", (find_next_cleaning(self.cleanings, self.now))['message'])
         
    
 
@@ -216,7 +218,6 @@ class TestRoutesWithMoc(TestCase):
 
     def test_street_cleaning(self):
         """tests street_cleaning route"""
-
         result = self.client.get('/street_cleaning.json',
                                  query_string={'address':'50', 'street':'California st', 'side':'North'})
         self.assertIn('Street cleaning is today. It\'s in 1 hours.', result.data)
@@ -328,22 +329,20 @@ class TestPlaceClass(TestCase):
 
     def tearDown(self):
         """Do at end of every test."""
-
-        db.drop_all()
+        
         db.session.close()
+        db.drop_all()
+    
 
     def test_get_sides(self):
         """tests get_sides function in helpers"""
-        # with self.place2.get_sides_for_this_location() as c:
-        #     self.assertEqual(['North'], c)
+        self.assertEqual(['North'], self.place2.get_sides_for_this_location())
 
-            # self.place2.get_sides_for_this_location())
     
     def test_find_location(self):
         """tests find_location method"""
-        pass
         
-        # self.assertEqual(str(self.place1.find_location()), '<rt: 0-100, lt: 1-1001 for loc: 1>')
+        self.assertEqual(str(self.place1.find_location()), '<rt: 0-100, lt: 1-1001 for loc: 1>')
 
     # def test_get_towing_locs(self):
     #     pass

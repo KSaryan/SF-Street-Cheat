@@ -197,7 +197,7 @@ def street_cleaning():
     geolocation = place.find_geolocation()
 
     now = get_datetime()
-    
+
     towing_locs = place.get_towing_locs()
     towings = Towing.get_towings(towing_locs, now)
     towing_message = Towing.get_towing_message(towings)

@@ -45,7 +45,6 @@ class Place(object):
 	                                          Location.street_id==street1.street_id,
 	                                          Location.lt_from_address <= self.address, 
 	                                          Location.lt_to_address >= self.address).first()
-
 	    return location
 
 	def get_sides_for_this_location(self):
