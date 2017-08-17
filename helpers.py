@@ -88,7 +88,7 @@ def prep_result(location, geolocation, towing_message):
 
     if next_cleaning['info'] == "now":
         result = {"info_message": next_cleaning['info'], 
-                  "message": next_cleaning['message'] + "/n" + holiday,
+                  "message": next_cleaning['message'] + "\n" + holiday,
                   "geolocation": geolocation,
                   "towing": towing_message}
 

@@ -120,6 +120,10 @@ def create_user():
     if phone:
         phone = re.sub(r"[\-\(\)\.\s]+", "", phone)
 
+    if len(email) > 30:
+        flash('Email too long')
+        return redirect('/')
+
     if db.session.query(User).filter(User.email==email).first():
         flash('There is already an email associated with this account. Please login.')
         return redirect('/')
@@ -152,8 +156,8 @@ def update_user_info():
     if number:
         number=re.sub(r"[\-\(\)\.\s]+", "", number)
 
-    if len(email) > 30:
-        flash('Password or email too long')
+    if len(email) > 30 :
+        flash('Email too long')
 
     elif len(number) != 10:
         flash("Invalid number. Make sure to include area code.")

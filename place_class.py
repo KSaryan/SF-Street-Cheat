@@ -103,7 +103,7 @@ class Place(object):
 		                                    	  Tow_Location.rt_from_address <= self.address, 
 		                                    	  Tow_Location.rt_to_address >= self.address).all()
 		else: 
-		  locations = Tow_Location.query.filter(Tow_Location.street_id==street1.street_id,
+		  	locations = Tow_Location.query.filter(Tow_Location.street_id==street1.street_id,
 		                                    Tow_Location.lt_from_address <= self.address, 
 		                                    Tow_Location.lt_to_address >= self.address).options(db.joinedload('towings')).all()
 

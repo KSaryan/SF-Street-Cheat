@@ -32,7 +32,6 @@ class MyAppUnitTestCase(TestCase):
         db.session.close()
         db.drop_all()
         
-
   
     def test_find_todays_cleaning(self):
         """tests find_todays_cleaning function in helpers"""
@@ -82,6 +81,13 @@ class TestRoutesLoggedIn(TestCase):
         result = self.client.get('/login', follow_redirects=True)
         self.assertIn("Confirm Your Location", result.data)
 
+    def test_log_out(self):
+        """test log out route"""
+
+        result = self.client.get('/logout', follow_redirects=True)
+        self.assertIn("login", result.data)
+        self.assertNotIn("Welcome", result.data)
+
     def test_parking_logged_in(self):
         """tests parking route"""
 
@@ -111,6 +117,26 @@ class TestRoutesLoggedIn(TestCase):
         self.assertIn("ksaryan3", result.data)
         self.assertIn('(818) 555 - 3333', result.data)
 
+    def test_updtae_user_bad_phone(self):
+
+        """tests update_user route"""
+        result = self.client.post('/update_user', 
+                                 data={'email':"ksaryan3", 'password':'boo', 'number':'555-3333'},
+                                 follow_redirects=True)
+
+        self.assertIn("Invalid number. Make sure to include area code.", result.data)
+
+
+    def test_update_user_bad_email(self):
+        """tests update_user route"""
+
+        result = self.client.post('/update_user', 
+                                 data={'email':"ksaryan3@thisisverylongandisclearlynotarealemailbutletscheckanywaytobesure", 
+                                 'password':'boo', 'number':'818555-3333'},
+                                 follow_redirects=True)
+
+        self.assertIn("Email too long", result.data)
+
 
     def test_add_fave_loc(self):
         """tests add_fave_loc route"""
@@ -119,6 +145,20 @@ class TestRoutesLoggedIn(TestCase):
                                  query_string={'street':'California-st', 'address':'50', 'side':'North', 'type':'wor'}, 
                                  follow_redirects=True)
         self.assertIn('50 California st', result.data)
+        
+
+    def test_update_fave_loc(self):
+        """tests add_fave_loc route"""
+
+        result = self.client.get('/add_fave_loc', 
+                                 query_string={'street':'California-st', 'address':'50', 'side':'North', 'type':'wor'}, 
+                                 follow_redirects=True)
+        self.assertIn('50 California st', result.data)
+        result = self.client.get('/add_fave_loc', 
+                                 query_string={'street':'Lake-st', 'address':'85', 'type':'wor'}, 
+                                 follow_redirects=True)
+        self.assertNotIn('50 California st', result.data)
+        self.assertIn('85 Lake st', result.data)
 
 
 class TestRoutesLoggedOut(TestCase):
@@ -167,6 +207,14 @@ class TestRoutesLoggedOut(TestCase):
                                   follow_redirects=True)
         self.assertIn("Username or password not found", result.data)
 
+    def test_wrong_password(self):
+        """tests incorrect password"""
+        result = self.client.post('/verify_user', 
+                                  data={'email': 'kristine', 'password':'notboo'}, 
+                                  follow_redirects=True)
+        self.assertIn("Username or password not found", result.data)
+
+
     def test_user_verify_success(self):
         """tests verify_user route"""
 
@@ -174,6 +222,7 @@ class TestRoutesLoggedOut(TestCase):
                                   data={'email': 'kristine', 'password':'boo'}, 
                                   follow_redirects=True)
         self.assertIn("Confirm Your Location", result.data)
+
 
     def test_create_user(self):
         """tests create_user route"""
@@ -184,12 +233,31 @@ class TestRoutesLoggedOut(TestCase):
         self.assertIn("Confirm Your Location", result.data)
 
     def test_create_user_bad_number(self):
-        """tests create_user route"""
+        """tests create_user route with bad phone number"""
 
         result = self.client.post('/create_user', 
                                   data={'new_email': 'ksaryan1', 'new_password':'boo2', 'new_number': '818888-88889'}, 
                                   follow_redirects=True)
         self.assertIn("Invalid number. Make sure to include area code.", result.data)
+
+    def test_create_user_email_too_long(self):
+        """tests create_user route with email too loong"""
+        result = self.client.post('/create_user', 
+                                  data={'new_email': 'ksaryan1@thisisverylongandisclearlynotarealemailbutletscheckanywaytobesure', 
+                                        'new_password':'boo2', 
+                                        'new_number': '818888-8888'}, 
+                                  follow_redirects=True)
+
+        self.assertIn("Email too long", result.data)
+
+
+    def test_account_already_exists(self):
+        """tests create_user route for already existing account"""
+        result = self.client.post('/create_user', 
+                                  data={'new_email': 'kristine', 'new_password':'boo2', 'new_number': '818888-88889'}, 
+                                  follow_redirects=True)
+        self.assertIn("There is already an email associated with this account. Please login.", result.data)
+        
 
 class TestRoutesWithMoc(TestCase):
     """Tests routes with user logged in and mock function for time"""
@@ -245,6 +313,15 @@ class TestRoutesWithMoc(TestCase):
         self.assertIn('Monday', result.data)
 
 
+    def test_street_cleaning_holidays(self):
+        """tests street_cleaning route including holiday hours"""
+
+        result = self.client.get('/street_cleaning.json',
+                                 query_string={'address':'50', 'street':'California st', 'side':'North'})
+        self.assertIn("There are holiday hours associated with this location. They are 8:00 - 13:00 (military time.)", result.data)
+
+
+
     def test_street_cleaning_wrong_address(self):
         """tests street_cleaning route"""
 
@@ -259,6 +336,13 @@ class TestRoutesWithMoc(TestCase):
                                  query_string={'address':'50', 'street':'California st' })
         self.assertIn('North', result.data)
         self.assertNotIn('South', result.data)
+
+    def test_find_sides_no_sides(self):
+        """tests find_sides route when the street has no sides"""
+
+        result = self.client.get('/find_sides.json',
+                                 query_string={'address':'50', 'street':'Lake st' })
+        self.assertIn('no sides', result.data)
 
 
 class TestUser1Text(TestCase):
@@ -326,6 +410,8 @@ class TestPlaceClass(TestCase):
         example_data()
         self.place1 = Place(address=50, street='California st', side='North')
         self.place2 = Place(address=50, street='California st')
+        self.place3 = Place(address=51, street='California st', side='North')
+        self.place4 = Place(address=55, street='California st')
 
 
     def tearDown(self):
@@ -338,15 +424,19 @@ class TestPlaceClass(TestCase):
     def test_get_sides(self):
         """tests get_sides function in helpers"""
         self.assertEqual(['North'], self.place2.get_sides_for_this_location())
-
+        self.assertEqual(['North'], self.place4.get_sides_for_this_location())
     
     def test_find_location(self):
         """tests find_location method"""
         
         self.assertEqual(str(self.place1.find_location()), '<rt: 0-100, lt: 1-1001 for loc: 1>')
+        self.assertEqual(str(self.place3.find_location()), '<rt: 0-100, lt: 1-1001 for loc: 1>')
 
-    # def test_get_towing_locs(self):
-    #     pass
+    def test_get_towing_locs(self):
+        """tests get_towing_locs method"""
+        
+        self.assertIn('[<rt: 0-500, lt: 1-501 for loc: 1>]', str(self.place2.get_towing_locs()))
+        self.assertIn('[<rt: 0-500, lt: 1-501 for loc: 1>]', str(self.place3.get_towing_locs()))
 
 
 if __name__ == "__main__":

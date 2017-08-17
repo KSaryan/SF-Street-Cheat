@@ -320,6 +320,13 @@ def example_data():
     street3 = Street(street_id = 3, street_name = "Lake st")
     side = Side(side_id = 1, side_name = "North")
     side2 = Side(side_id = 2, side_name = "South")
+    towside = Tow_Side(tow_side_name='left')
+    tow_loc = Tow_Location(street_id = 1, 
+                           rt_from_address = 0,
+                           rt_to_address = 500,
+                           lt_from_address = 1,
+                           lt_to_address = 501,
+                           tow_side_id = 1)
     location = Location (loc_id = 1, street_id = 1, 
                          rt_from_address = 0,
                          rt_to_address = 100,
@@ -377,18 +384,28 @@ def example_data():
                         end_time = '13:00',
                         week_of_mon = 3,
                         day_id = 'Mon')
+    cleaning7= Cleaning(loc_id=1,
+                        start_time = '8:00',
+                        end_time = '13:00',
+                        week_of_mon = 3,
+                        day_id = 'Hol')
+    towing = Towing(tow_loc_id = 1,
+                    start_time = '8:00',
+                    day_id = 'Thu')
 
     day = Day(day_id = 'Thu', day_name = 'Thursday', day_short="Th")
     day2 = Day(day_id = 'Fri', day_name ='Friday', day_short="Fr")
     day3 = Day(day_id = 'Mon', day_name ='Monday', day_short="Mo")
+    day4 = Day(day_id="Hol", day_short="Ho", day_name="Holiday")
     type1 = Type(type_id="hom", type_name="Home")
     type2 = Type(type_id="wor", type_name="Work")
     type3 = Type(type_id="las", type_name="Recent")
-    db.session.add_all([day, day2, cleaning, cleaning2, 
-                        location, location2, side, street, 
-                        user, street2, side2, location3,
-                        cleaning3, user2, street3, location4, cleaning6,
-                        type2, type3, type1, cleaning4, cleaning5, day3])
+    db.session.add_all([day, day2, day3, day4, cleaning, cleaning2, 
+                        cleaning3, cleaning4, cleaning5, cleaning6,
+                        cleaning7, location, location2, location3,
+                        location4, side, side2, street, street2,
+                        street3, user, user2, type2, type3, type1,
+                        towside, tow_loc, towing])
     db.session.commit()
 
 def connect_to_db(app, db_uri = "postgres:///parking"):
