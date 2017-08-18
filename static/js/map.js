@@ -15,8 +15,8 @@ function initMap() {
         map.setMapTypeId('styled_map');        
 
 
-  infoWindow = new google.maps.InfoWindow;
-  // console.log(infoWindow);
+  infoWindow = new google.maps.InfoWindow();
+  
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       var pos = {
