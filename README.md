@@ -103,6 +103,12 @@ python server.py
 
 You can now navigate to 'localhost:5000/' to access SF StreetCheat.
 
+However, to run the ob that sends text messages and emails to user, you will need to run the timed file:
+
+```
+python timed.py
+```
+
 
 ## <a name="testing"></a> Testing
 To run tests:
