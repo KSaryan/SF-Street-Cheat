@@ -113,7 +113,7 @@ python timed.py
 ## <a name="testing"></a> Testing
 To run tests:
 
-Set up tests database:
+Set up a test database:
 
 ```
 createdb testdb
