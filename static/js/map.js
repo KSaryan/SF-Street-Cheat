@@ -29,7 +29,6 @@ function initMap() {
       infoWindow.open(map);
       map.setCenter(pos);
     }, function(posError) {
-      console.log(posError);
       handleLocationError(true, infoWindow, map.getCenter());
     });
   } else {

@@ -16,6 +16,7 @@ class Street(db.Model):
 
     @staticmethod
     def clean_street(name):
+        
         return name.replace("-", " ")
 
     def __repr__ (self):

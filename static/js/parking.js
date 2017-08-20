@@ -26,6 +26,7 @@ function changeView3(){
 $('#locationsbtn').on('click', changeView3);
 
 
+// Turns markers green when their button is clicked on
 function changeMarkers(num){
     for (var i = 0; i<allMarkers.length; i++){
         if (allMarkers[i].num == num){
@@ -38,6 +39,8 @@ function changeMarkers(num){
 
 $(document).on('click','.placebtnclass', function(){changeMarkers(this.id);});
 
+
+// Changes map center when user chooses new location
 function changeMap(result){
     var latlng = {'lat': result['lat'], 
                   'lng': result['lng']}

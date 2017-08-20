@@ -185,7 +185,7 @@ def parking():
 
     streets = Street.query.order_by(Street.street_name.asc()).all()
     sides = Side.query.all()
-    return render_template('parking.html', streets=streets, sides=sides)
+    return render_template('parking.html', sides=sides, streets=streets)
 
 
 @app.route('/street_cleaning.json')
@@ -294,12 +294,13 @@ def find_nearby_cleanings():
                   address=address,
                   side=side)
     closest_places = place.find_nearby_places()
-    #replacing loc_id with message about when street cleaning is
+ 
     for place in closest_places:
         loc_id = place['loc_id']
         street_cleanings = Cleaning.query.filter(Cleaning.loc_id==loc_id).all()
         next_cleaning = get_next_cleaning(street_cleanings)
         place['message']= next_cleaning['message']
+    
     #putting information in an organized dictionary
     results = {}
     for i in range (len(closest_places)):
@@ -380,12 +381,12 @@ def my_places():
 #     all_cleanings = {'all_geos': geos}
 #     return jsonify(all_cleanings)
 
-# @app.route('/geo_for_map')
-# def get_geo_for_map():
-#     place = Place(address = request.args.get("address"), 
-#                   street= Street.clean_street(request.args.get("street")))
-#     geo = place.find_geolocation()
-#     return jsonify(geo)
+@app.route('/geo_for_map')
+def get_geo_for_map():
+    place = Place(address = request.args.get("address"), 
+                  street= Street.clean_street(request.args.get("street")))
+    geo = place.find_geolocation()
+    return jsonify(geo)
   
 if __name__ == "__main__":
 

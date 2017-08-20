@@ -1,8 +1,6 @@
 $('#gettext').toggle();
 $('#locationsbtn').toggle();
 $('#logintextbtn').toggle();
-// $('#timepanel').toggle();
-// $('#towingpanel').toggle();
 
 
 function displayStreetCleaningResults(result){
@@ -41,48 +39,3 @@ function submitAddress(evt){
 }
 
 $('#addressbtn').on('click', submitAddress)
-
-
-function findingSides2(result){
-    // $('#sidediv').fadeOut();
-    $('.sides').addClass('hidden');
-    if (result != "no sides"){
-        var listOfSides = result["sides"];
-        for (var i=0; i< listOfSides.length; i++){
-            var sideId = '#' + listOfSides[i];
-            $(sideId).removeClass('hidden'); 
-        }
-    }
-    // $('#sidediv').fadeIn();
-}
-
-        
-function streetSide2(){
-     var addressInputs = {
-        "address": $('#address').val(),
-        "street": $('#street').val(),
-    };
-    $.get('/find_sides.json', addressInputs, findingSides2); 
-}
-
-$('#addres').change(streetSide2);
-$('#street').change(streetSide2);
-
-
-function displayLocationResults(result){
-    $("#address").val(result["address"]);
-    $("#street").val(result["street"]);
-    findingSides2(result);
-}
-
-function getCordinates(){
-    navigator.geolocation.getCurrentPosition(function(position) {
-          var pos = {
-            'lat': position.coords.latitude,
-            'lng': position.coords.longitude
-          };
-    $.get('/current_location.json', pos, displayLocationResults);
-})
-}
-
-$(document).ready(getCordinates)
