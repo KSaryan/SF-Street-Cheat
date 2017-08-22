@@ -49,13 +49,11 @@ function changeMap(result){
 }
 
 function getGeoForMap(){
-    var data = {
-        "address": $('#address').val(),
-        "street": $("#street").val()
-    }
+    var data = $('#'+this.dataset.formId).serialize();
 
     $.get('/geo_for_map', data, changeMap)
 }
+
 $('#usethisaddress').on('click', getGeoForMap)
 
 $('#registerbtn2').on('click', function(){$('#registerform2').removeClass('hidden');});

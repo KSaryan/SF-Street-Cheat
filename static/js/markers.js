@@ -73,13 +73,7 @@ function showLocations(result){
 
 
 function getLocations(){
-    var address = $('#address').val();
-    var street = $('#street').val();
-    var side =$('#side').val();
-    var address_info = {"address": address,
-                       "street": street,
-                       "side":side
-    };
+    var address_info = $('#'+this.dataset.formId).serialize();
     $.get('/nearby_cleanings.json', address_info, showLocations);
 }
 

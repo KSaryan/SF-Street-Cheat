@@ -43,7 +43,7 @@
     </div>
     <div class= "col-xs-4">
       <div id="title"> <h1>Confirm Your Location</h1> </div>
-        <form id="adressinfo" role="form">
+        <form id="addressinfo" role="form">
             <div id="section1">
                 <div class="form-group">
                     <label for="address">Address</label>
@@ -60,7 +60,7 @@
                         </select>
                     </div>
                 </div>
-                <button id="usethisaddress" class="btn btn-default"> Use This Address </button>
+                <button id="usethisaddress" data-form-id="addressinfo" class="btn btn-default"> Use This Address </button>
             </div>
             
             <div id="section2" class="form-group hidden">
@@ -73,7 +73,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-default" id="addressbtn">When is Street Cleaning?</button>
+                <input type="submit" class="btn btn-default" id="addressbtn" value="When is Street Cleaning?" />
             </form>
             </div>
         <div id="section3" class= "hidden">
@@ -100,7 +100,7 @@
             </div>
             
             <div id="markerbtns" class="row">
-                <button id="locationsbtn" class="btn btn-default">Parking In My Hood</button>
+                <button id="locationsbtn" data-form-id="addressinfo" class="btn btn-default">Parking In My Hood</button>
             </div>
             
         </div>

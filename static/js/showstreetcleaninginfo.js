@@ -28,14 +28,12 @@ function displayStreetCleaningResults(result){
 }
 
 function submitAddress(evt){
+
     evt.preventDefault();
 
-    var addressInputs = {
-        "address": $('#address').val(),
-        "street": $('#street').val(),
-        "side": $('#side').val()
-    };
+    var addressInputs = $( this ).serialize() 
+
     $.get('/street_cleaning.json', addressInputs, displayStreetCleaningResults);
 }
 
-$('#addressbtn').on('click', submitAddress)
+$('#addressinfo').on('submit', submitAddress)
