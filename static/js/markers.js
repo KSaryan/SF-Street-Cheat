@@ -20,7 +20,7 @@ function adjustMap(){
 }
 
 function createButton(num, text){
-  $('#placesdiv').prepend('<button class="btn-default markerbtn placebtnclass" id =' + num + ' >' + text + "</button><br>"); 
+  $('#placesdiv').prepend('<div><button class="btn-default markerbtn placebtnclass" id =' + num + ' >' + text + "</button></div>"); 
   allNums.push(num);
 }
 

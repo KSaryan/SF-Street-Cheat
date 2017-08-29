@@ -35,10 +35,14 @@ function removeSomeMarkers(num){
                 allMarkers[j].setMap(null);
                 var id = allMarkers[j].num;
                 $('#' + (id).toString()).hide();
+                // ('#' + (id).toString()).parent.remove();
     }
         }
 }
 }
+ $(document).on("change", ".placebtnclass", function() { 
+      $(this).parent().remove(); 
+ });
 
 function getRidOfMarkers(evt){
     evt.preventDefault();
