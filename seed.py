@@ -102,19 +102,19 @@ def create_cleanings():
                 day_id = "Tue"
 
             if item["week1ofmon"] == "Y":
-                cleaning1 = Cleaning(day_id = day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 1, locations=location)
+                cleaning1 = Cleaning(day_id = day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 1, location=location)
                 db.session.add(cleaning1)
             if item["week2ofmon"] == "Y":
-                cleaning2 = Cleaning(day_id = day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 2, locations=location)
+                cleaning2 = Cleaning(day_id = day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 2, location=location)
                 db.session.add(cleaning2)
             if item["week3ofmon"] == "Y":
-                cleaning3 = Cleaning(day_id=day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 3, locations=location)
+                cleaning3 = Cleaning(day_id=day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 3, location=location)
                 db.session.add(cleaning3)
             if item["week4ofmon"] == "Y":
-                cleaning4 = Cleaning(day_id=day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 4, locations=location)
+                cleaning4 = Cleaning(day_id=day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 4, location=location)
                 db.session.add(cleaning4)
             if item["week5ofmon"] == "Y":
-                cleaning5 = Cleaning(day_id=day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 5, locations=location)
+                cleaning5 = Cleaning(day_id=day_id, start_time=item["fromhour"], end_time=item["tohour"], week_of_mon = 5, location=location)
                 db.session.add(cleaning5)
 
     db.session.commit()
