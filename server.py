@@ -310,6 +310,16 @@ def find_nearby_cleanings():
     return jsonify(results)
 
 
+@app.route('/get_fave_locs.json')
+def get_fave_locs():
+    """Returns all current fave_location possibilities"""
+
+    fave_places = db.session.query(Type.type_name).all()
+
+    data = {'fave_places': fave_places}
+
+    return jsonify(data)
+
 @app.route('/add_fave_loc')
 def add_a_fave():
     """Adds a new location to FaveLocation table"""
@@ -383,14 +393,17 @@ def my_places():
 
 @app.route('/geo_for_map')
 def get_geo_for_map():
+    """Returns geolocation for an address"""
+
     place = Place(address = request.args.get("address"), 
                   street= Street.clean_street(request.args.get("street")))
     geo = place.find_geolocation()
     return jsonify(geo)
+
   
 if __name__ == "__main__":
 
-    app.debug = True
+    # app.debug = True
     connect_to_db(app)
 
 
