@@ -1,5 +1,5 @@
 # SF StreetCheat
-visit at [sfstreetcheat.com](https://sfstreetcheat.com)
+visit at [sfstreetcheat.com](http://sfstreetcheat.com)
 
 SF StreetCheat is a 4 week project that I completed during my time as a software engineering fellow at Hackbright Academy. It is designed to help San Francisco residents avoid expensive parking tickets. With street cleaning happening at different times on different streets, different blocks, and even different sides of the same block, it can be difficult to remember when you need to move your car. Even if you do check the signs, you can get distracted and forget to move it in time. SF StreetCheat uses the data provided by DataSF through the Soda API, along with the Goggle Maps, SendGrid,  and Twilio APIs to not only show users how long they have until street cleaning, but also to send them texts or emails reminding them to move their car before street cleaning time. This way they can go about their day or week knowing they won't return to their car only to face a hefty ticket. SF StreetCheat also helps users find nearby streets that have street cleaning times that better fit their needs.
 
