@@ -21,6 +21,8 @@ from operator import itemgetter
 from decimal import Decimal
 from functools import wraps
 from place_class import Place
+from timed import schedule
+import threading
 
 
 
@@ -400,12 +402,22 @@ def get_geo_for_map():
     geo = place.find_geolocation()
     return jsonify(geo)
 
+
+
   
 if __name__ == "__main__":
-
     # app.debug = True
     connect_to_db(app)
 
+    def run_jobs(app):
+        sched = threading.Thread(name='schedule', target=schedule)
+        app = threading.Thread(name='app', target=app.run(port=5000, host='0.0.0.0'))
+        sched.start()
+        app.start()
 
-    app.run(port=5000, host='0.0.0.0')
+    run_jobs(app)
+
+
+    
+
 
