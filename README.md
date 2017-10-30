@@ -9,6 +9,7 @@ SF StreetCheat is a 4 week project that I completed during my time as a software
 * [Features](#features)
 * [Installation](#install)
 * [Testing](#testing)
+* [To Do](#todo)
 
 ## <a name="technologies"></a>Technologies
 <b>Backend:</b> Python, Flask, PostgreSQL, SQLAlchemy<br/>
@@ -121,3 +122,6 @@ Run the tests:
 python tests.py
 ```
 
+## <a name="todo"></a> To Do
+
+- [ ] Security Certificate
