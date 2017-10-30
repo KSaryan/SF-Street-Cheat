@@ -105,12 +105,6 @@ python server.py
 
 You can now navigate to 'localhost:5000/' to access SF StreetCheat.
 
-However, to run the job that sends text messages and emails to users, you will need to run one more file:
-
-```
-python timed.py
-```
-
 
 ## <a name="testing"></a> Testing
 To run tests:
