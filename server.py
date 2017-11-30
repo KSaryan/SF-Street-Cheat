@@ -21,7 +21,7 @@ from operator import itemgetter
 from decimal import Decimal
 from functools import wraps
 from place_class import Place
-from timed import schedule
+from timed import schedule_cron
 import threading
 
 
@@ -409,9 +409,12 @@ if __name__ == "__main__":
     # app.debug = True
     connect_to_db(app)
 
+    def run_app():
+        app.run(port=5000, host='0.0.0.0')
+
     def run_jobs(app):
-        sched = threading.Thread(name='schedule', target=schedule)
-        app = threading.Thread(name='app', target=app.run(port=5000, host='0.0.0.0'))
+        sched = threading.Thread(name='schedule_cron', target=schedule_cron)
+        app = threading.Thread(name='app', target=run_app)
         sched.start()
         app.start()
 

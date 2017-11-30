@@ -51,7 +51,7 @@ def job():
         db.session.delete(m)
         db.session.commit()
 
-def schedule():
+def schedule_cron():
     schedule.every(20).minutes.do(job)
 
     while 1:
