@@ -1,20 +1,15 @@
-$('#Recentbtn').on('click', function(){$('#Recentform').removeClass();$('#Recentbtn').addClass('hidden');})
-$('#Workbtn').on('click', function(){$('#Workform').removeClass();$('#Workbtn').addClass('hidden');})
-$('#Homebtn').on('click', function(){$('#Homeform').removeClass();$('#Homebtn').addClass('hidden');})
-
-
 function findingSides(result, sideDiv, aClass){
     var listOfSides = result["sides"];
     $(sideDiv).fadeOut();
     $('.sides').addClass('hidden');
-
+ 
     for (var i=0; i< listOfSides.length; i++){
         var sideId = '#' + listOfSides[i] + aClass;
         $(sideId).removeClass('hidden'); 
     }
     $(sideDiv).fadeIn();
 }
-     
+      
 function streetSide(sideDiv, address, street, aClass){
     var addressInputs = {
         "address": $(address).val(),
@@ -22,12 +17,20 @@ function streetSide(sideDiv, address, street, aClass){
     };
     $.get('/find_sides.json', addressInputs, function(result){findingSides(result, sideDiv, aClass);}); 
 }
-
-$('#Homeaddress').change(function(){streetSide('#Homesidediv', '#Homeaddress', '#Homestreet', '.Home');});
-$('#Homestreet').change(function(){streetSide('#Homesidediv', '#Homeaddress', '#Homestreet', '.Home');});
-
-$('#Workaddress').change(function(){streetSide('#Worksidediv', '#Workaddress', '#Workstreet', '.Work');});
-$('#Workstreet').change(function(){streetSide('#Worksidediv', '#Workaddress', '#Workstreet', '.Work');});
-
-$('#Recentaddress').change(function(){streetSide('#Recentsidediv', '#Recentaddress', '#Recentstreet', '.Recent');});
-$('#Recentstreet').change(function(){streetSide('#Recentsidediv', '#Recentaddress', '#Recentstreet', '.Recent');});
+ 
+ 
+function setListeners(result){
+    var favePlaces = result['fave_places']
+    console.log(favePlaces)
+    for (var place of favePlaces){
+        place = place[0]
+        $('#'+place+'btn').on('click', function(){$('#'+place+'form').removeClass();$('#'+place+'btn').addClass('hidden');})
+        $('#'+place+'address').change(function(){streetSide('#'+place+'sidediv', '#'+place+'address', '#'+place+'street', '.'+place);});
+        $('#'+place+'street').change(function(){streetSide('#'+place+'sidediv', '#'+place+'address', '#'+place+'street', '.'+place);});
+    }
+}
+ 
+ 
+$(document).ready(function(){
+    $.get('/get_fave_locs.json', setListeners);
+});

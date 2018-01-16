@@ -2,7 +2,6 @@ import schedule
 import time
 from datetime import datetime, timedelta
 from model import (User, MessageToSend, connect_to_db, db)
-from server import app
 import os
 from twilio.rest import Client
 import sendgrid
@@ -13,7 +12,7 @@ import logging
 LOG_FILENAME = 'failed_messages.log'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 
-connect_to_db(app)
+# connect_to_db(app)
 
 def job():
     time = datetime.now() + timedelta(minutes=30)
